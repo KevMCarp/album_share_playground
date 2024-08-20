@@ -65,8 +65,11 @@
     "assetsThumbnails": "Assets & thumbnails",
     "user": "User",
     "unknownError": "An unknown error occurred",
-    "appInitError": "Error initialising application"
-
+    "appInitError": "Error initialising application",
+    "logs": "Logs",
+    "close": "Close",
+    "clipboardSave": "Saved to clipboard",
+    "support" : "Support"
 
 
 }

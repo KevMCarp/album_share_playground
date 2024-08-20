@@ -43,15 +43,15 @@ const PreferencesSchema = CollectionSchema(
       name: r'loadPreview',
       type: IsarType.bool,
     ),
-    r'maxExtent': PropertySchema(
+    r'loopVideos': PropertySchema(
       id: 5,
+      name: r'loopVideos',
+      type: IsarType.bool,
+    ),
+    r'maxExtent': PropertySchema(
+      id: 6,
       name: r'maxExtent',
       type: IsarType.long,
-    ),
-    r'shouldLoopVideo': PropertySchema(
-      id: 6,
-      name: r'shouldLoopVideo',
-      type: IsarType.bool,
     ),
     r'syncFrequency': PropertySchema(
       id: 7,
@@ -99,8 +99,8 @@ void _preferencesSerialize(
   writer.writeByte(offsets[2], object.groupBy.index);
   writer.writeBool(offsets[3], object.loadOriginal);
   writer.writeBool(offsets[4], object.loadPreview);
-  writer.writeLong(offsets[5], object.maxExtent);
-  writer.writeBool(offsets[6], object.loopVideos);
+  writer.writeBool(offsets[5], object.loopVideos);
+  writer.writeLong(offsets[6], object.maxExtent);
   writer.writeLong(offsets[7], object.syncFrequency);
   writer.writeByte(offsets[8], object.theme.index);
 }
@@ -119,8 +119,8 @@ Preferences _preferencesDeserialize(
             GroupAssetsBy.day,
     loadOriginal: reader.readBoolOrNull(offsets[3]) ?? false,
     loadPreview: reader.readBoolOrNull(offsets[4]) ?? true,
-    maxExtent: reader.readLongOrNull(offsets[5]) ?? 90,
-    loopVideos: reader.readBoolOrNull(offsets[6]) ?? true,
+    loopVideos: reader.readBoolOrNull(offsets[5]) ?? true,
+    maxExtent: reader.readLongOrNull(offsets[6]) ?? 90,
     syncFrequency: reader.readLongOrNull(offsets[7]) ?? 1800,
     theme: _PreferencesthemeValueEnumMap[reader.readByteOrNull(offsets[8])] ??
         ThemeMode.system,
@@ -147,9 +147,9 @@ P _preferencesDeserializeProp<P>(
     case 4:
       return (reader.readBoolOrNull(offset) ?? true) as P;
     case 5:
-      return (reader.readLongOrNull(offset) ?? 90) as P;
-    case 6:
       return (reader.readBoolOrNull(offset) ?? true) as P;
+    case 6:
+      return (reader.readLongOrNull(offset) ?? 90) as P;
     case 7:
       return (reader.readLongOrNull(offset) ?? 1800) as P;
     case 8:
@@ -426,6 +426,16 @@ extension PreferencesQueryFilter
   }
 
   QueryBuilder<Preferences, Preferences, QAfterFilterCondition>
+      loopVideosEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'loopVideos',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Preferences, Preferences, QAfterFilterCondition>
       maxExtentEqualTo(int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -477,16 +487,6 @@ extension PreferencesQueryFilter
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
-      ));
-    });
-  }
-
-  QueryBuilder<Preferences, Preferences, QAfterFilterCondition>
-      shouldLoopVideoEqualTo(bool value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'shouldLoopVideo',
-        value: value,
       ));
     });
   }
@@ -674,6 +674,18 @@ extension PreferencesQuerySortBy
     });
   }
 
+  QueryBuilder<Preferences, Preferences, QAfterSortBy> sortByLoopVideos() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'loopVideos', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Preferences, Preferences, QAfterSortBy> sortByLoopVideosDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'loopVideos', Sort.desc);
+    });
+  }
+
   QueryBuilder<Preferences, Preferences, QAfterSortBy> sortByMaxExtent() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'maxExtent', Sort.asc);
@@ -683,19 +695,6 @@ extension PreferencesQuerySortBy
   QueryBuilder<Preferences, Preferences, QAfterSortBy> sortByMaxExtentDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'maxExtent', Sort.desc);
-    });
-  }
-
-  QueryBuilder<Preferences, Preferences, QAfterSortBy> sortByShouldLoopVideo() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'shouldLoopVideo', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Preferences, Preferences, QAfterSortBy>
-      sortByShouldLoopVideoDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'shouldLoopVideo', Sort.desc);
     });
   }
 
@@ -803,6 +802,18 @@ extension PreferencesQuerySortThenBy
     });
   }
 
+  QueryBuilder<Preferences, Preferences, QAfterSortBy> thenByLoopVideos() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'loopVideos', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Preferences, Preferences, QAfterSortBy> thenByLoopVideosDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'loopVideos', Sort.desc);
+    });
+  }
+
   QueryBuilder<Preferences, Preferences, QAfterSortBy> thenByMaxExtent() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'maxExtent', Sort.asc);
@@ -812,19 +823,6 @@ extension PreferencesQuerySortThenBy
   QueryBuilder<Preferences, Preferences, QAfterSortBy> thenByMaxExtentDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'maxExtent', Sort.desc);
-    });
-  }
-
-  QueryBuilder<Preferences, Preferences, QAfterSortBy> thenByShouldLoopVideo() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'shouldLoopVideo', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Preferences, Preferences, QAfterSortBy>
-      thenByShouldLoopVideoDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'shouldLoopVideo', Sort.desc);
     });
   }
 
@@ -887,16 +885,15 @@ extension PreferencesQueryWhereDistinct
     });
   }
 
-  QueryBuilder<Preferences, Preferences, QDistinct> distinctByMaxExtent() {
+  QueryBuilder<Preferences, Preferences, QDistinct> distinctByLoopVideos() {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'maxExtent');
+      return query.addDistinctBy(r'loopVideos');
     });
   }
 
-  QueryBuilder<Preferences, Preferences, QDistinct>
-      distinctByShouldLoopVideo() {
+  QueryBuilder<Preferences, Preferences, QDistinct> distinctByMaxExtent() {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'shouldLoopVideo');
+      return query.addDistinctBy(r'maxExtent');
     });
   }
 
@@ -952,15 +949,15 @@ extension PreferencesQueryProperty
     });
   }
 
-  QueryBuilder<Preferences, int, QQueryOperations> maxExtentProperty() {
+  QueryBuilder<Preferences, bool, QQueryOperations> loopVideosProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'maxExtent');
+      return query.addPropertyName(r'loopVideos');
     });
   }
 
-  QueryBuilder<Preferences, bool, QQueryOperations> shouldLoopVideoProperty() {
+  QueryBuilder<Preferences, int, QQueryOperations> maxExtentProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'shouldLoopVideo');
+      return query.addPropertyName(r'maxExtent');
     });
   }
 

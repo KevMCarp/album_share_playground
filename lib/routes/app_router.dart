@@ -55,7 +55,6 @@ class AppRouter {
             GoRoute(
               path: _kPreferencesRoute,
               builder: (_, __) => const PreferencesScreen(),
-              redirect: (_, __) => _authRedirect(true),
             ),
             GoRoute(
               path: _kAssetViewerRoute,
@@ -63,7 +62,6 @@ class AppRouter {
                 viewerState:
                     AssetViewerScreenState.fromExtra(state.extra ?? {}),
               ),
-              redirect: (_, __) => _authRedirect(true),
             ),
           ],
         ),

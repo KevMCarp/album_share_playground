@@ -12,6 +12,7 @@ import 'assets/original_image_widget.dart';
 import 'assets/preview_image_widget.dart';
 import 'general/haptic_feedback_widget.dart';
 import 'general/theme_widget.dart';
+import 'support/log_widget.dart';
 import 'user/password_widget.dart';
 import 'user/sign_out_widget.dart';
 
@@ -89,6 +90,9 @@ class PreferencesWidget extends ConsumerWidget {
         Text(locale.user, style: captionStyle),
         const PasswordWidget(),
         const SignOutWidget(),
+        const Divider(),
+        Text(locale.support, style: captionStyle),
+        const LogsWidget(),
       ],
     );
   }

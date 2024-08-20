@@ -6,6 +6,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
+import 'package:logging/logging.dart';
 
 import '../../models/album.dart';
 import '../../models/asset.dart';
@@ -14,6 +15,8 @@ import '../../models/json_map.dart';
 import '../../models/user.dart';
 
 const _applicationJson = 'application/json';
+
+final _logger = Logger('ApiService');
 
 class ApiService {
   const ApiService(this._dio, this._cookieJar);
@@ -25,12 +28,14 @@ class ApiService {
     final available = await _isEndpointAvailable(serverUrl);
 
     if (!available) {
-      //TODO: Log
+      _logger.info('Endpoint $serverUrl could not be reached');
       throw const ApiException(
-          ApiExceptionType.timeout, 'Enpoint unavailable or does not exist.');
+        ApiExceptionType.timeout,
+        'Endpoint unavailable or does not exist.',
+      );
     }
 
-    //TODO: Log, endpoint set.
+    _logger.info('Endpoint $serverUrl set');
 
     _dio.options.baseUrl = serverUrl;
     _dio.options.headers = {'Accept': _applicationJson};
@@ -40,13 +45,40 @@ class ApiService {
 
     final isOAuth = await _checkIsOAuth();
 
+    _logger.info('Endpoint is oAuth: $isOAuth');
+
     return Endpoint(serverUrl, isOAuth);
   }
 
+  /// Checks the already set endpoint to see if it is currently reachable.
+  Future<bool> checkEndpoint() async {
+    final available = await _isEndpointAvailable('');
+
+    if (!available) {
+      _logger.info('Endpoint could not be reached');
+    }
+
+    return available;
+  }
+
   /// Check to see if oauth has been enabled on the server.
-  Future<bool> _checkIsOAuth() {
-    return Future.value(false);
-    //TODO:
+  Future<bool> _checkIsOAuth() async {
+    _expectEndpointSet();
+
+    try {
+      final body = await _get(
+        '/api/server-info/features',
+        expected: JSON_MAP,
+      );
+
+      return body['oauth'];
+    } on ApiException catch (e, s) {
+      _logger.severe(
+          'Failed to check oauth status of the server. Defaulting to false.',
+          e,
+          s);
+      return false;
+    }
   }
 
   /// Attempts to ping the server.
@@ -105,14 +137,14 @@ class ApiService {
       );
 
       return body['authStatus'];
-    } on ApiException catch (e) {
-      print('${e.message}: ${e.debugMessage}');
-      return false;
+    } on DioException catch (e, s) {
+      _logger.severe('Unable to validate endpoint token', e, s);
+      throw ApiException.fromDioException(e);
     }
   }
 
   /// Gets the profile for the current user.
-  /// 
+  ///
   /// Throws [ApiException] if unsuccessful.
   Future<User> currentUser() async {
     _expectEndpointSet();
@@ -122,10 +154,12 @@ class ApiService {
       expected: JSON_MAP,
     );
 
-    // Access token is not returned in the response. 
+    // Access token is not returned in the response.
     // However, because the user is authenticated the access token can be found in the request cookies.
-    final cookies = await _cookieJar.loadForRequest(Uri.parse(_dio.options.baseUrl));
-    final token = cookies.firstWhere((e) => e.name == 'immich_access_token').value;
+    final cookies =
+        await _cookieJar.loadForRequest(Uri.parse(_dio.options.baseUrl));
+    final token =
+        cookies.firstWhere((e) => e.name == 'immich_access_token').value;
 
     return User.fromJson(body, token);
   }
@@ -204,6 +238,7 @@ class ApiService {
   /// Ensures the server url has been set via a call to [checkAndSetEndpoint]
   void _expectEndpointSet() {
     if (_dio.options.baseUrl.isEmpty) {
+      _logger.severe('Endpoint was not set before api called');
       throw const ApiException(
           ApiExceptionType.client, 'Server url has not been set');
     }
@@ -214,6 +249,8 @@ class ApiService {
   /// Throws [ApiException] if the request was not valid or extraction failed.
   Future<JsonMap> _extractObjectFromResponse(Response response) async {
     if (response.statusCode == null || response.statusCode! > 201) {
+      _logger.severe('Unable to extract object from response data. '
+          'The server returned a status code of: ${response.statusCode}');
       throw ApiException(ApiExceptionType.server,
           response.statusMessage ?? '${response.data}');
     }
@@ -232,6 +269,8 @@ class ApiService {
     if (body == null ||
         body.isEmpty ||
         response.statusCode == HttpStatus.noContent) {
+      _logger.severe('Unable to extract object from response data. '
+          'No content included with the response');
       throw const ApiException(
           ApiExceptionType.server, 'No content included with response');
     }
@@ -245,6 +284,8 @@ class ApiService {
   Future<List<JsonMap>> _extractObjectListFromResponse(
       Response response) async {
     if (response.statusCode == null || response.statusCode! > 201) {
+      _logger.severe('Unable to extract object list from response data. '
+          'The server returned a status code of: ${response.statusCode}');
       throw ApiException(ApiExceptionType.server,
           response.statusMessage ?? '${response.data}');
     }
@@ -266,6 +307,8 @@ class ApiService {
         body.isEmpty ||
         response.statusCode == HttpStatus.noContent) {
       //TODO: Should 204 return null to signal data hasn't changed?
+      _logger.severe('Unable to extract object from response data. '
+          'No content included with the response');
       return [];
     }
 
@@ -295,8 +338,9 @@ class ApiService {
       return expected is JsonMap?
           ? await _extractObjectFromResponse(response) as T
           : await _extractObjectListFromResponse(response) as T;
-    } on DioException catch (e) {
+    } on DioException catch (e, s) {
       // TODO: log
+      _logger.severe('Unexpected DioException', e, s);
       throw ApiException.fromDioException(e);
     }
   }
@@ -324,8 +368,10 @@ class ApiService {
       return expected is JsonMap
           ? await _extractObjectFromResponse(response) as T
           : await _extractObjectListFromResponse(response) as T;
-    } on DioException catch (e) {
+    } on DioException catch (e, s) {
       // Unable to reach endpoint.
+      _logger.severe('Unexpected DioException', e, s);
+
       throw ApiException.fromDioException(e);
     }
   }
@@ -351,7 +397,7 @@ class ApiException implements Exception {
     };
   }
 
- @override
+  @override
   String toString() {
     return 'ApiException: $message';
   }

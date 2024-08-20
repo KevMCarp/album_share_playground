@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:logging/logging.dart';
 
+import '../../services/logger/app_logger.dart';
 import '../components/app_window/app_window.dart';
 import '../utils/app_localisations.dart';
 
@@ -18,6 +20,16 @@ class AppLifecycleScope extends StatefulWidget {
 
 class _AppLifecycleScopeState extends State<AppLifecycleScope>
     with WidgetsBindingObserver {
+  final logger = Logger('AppLifecycleScope');
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.detached) {
+      AppLogger.instance.flush();
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -35,8 +47,8 @@ class _AppLifecycleScopeState extends State<AppLifecycleScope>
     final locale = AppLocalizations.of(context)!;
     AppLocale.instance.set(locale);
     AppWindow.setWindow(locale.appTitle)
-        .then((_) => print('App window set'))
-        .onError((e, _) => print('Failed to set window $e'));
+        .then((_) => logger.info('App window set'))
+        .onError((e, s) => logger.severe('Failed to set window', e, s));
   }
 
   @override

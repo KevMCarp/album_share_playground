@@ -37,7 +37,7 @@ class AuthService {
   }
 
   /// Sets the current server url endpoint.
-  /// 
+  ///
   /// Returns true for oauth login, otherwise returns false for password login.
   ///
   /// Throws [ApiException] or [DatabaseException] if unsuccessful.
@@ -50,19 +50,13 @@ class AuthService {
   }
 
   Future<bool> checkAuthStatus() async {
-    final endpoint = await _db.getEndpoint();
-    if (endpoint == null) {
-      return false;
-    }
-
     try {
-      await _api.checkAndSetEndpoint(endpoint.serverUrl);
+      return await _api.validateAuthToken();
     } on ApiException catch (_) {
-      final user = await _db.getUser();
-      print('Working offline');
-      return user != null;
+      // User previously logged in, currently offline so assume authenticated still.
+      // This avoids redirect to login screen when offline.
+      return true;
     }
-    return await _api.validateAuthToken();
   }
 
   /// Attempts to login the user with the specified email and password

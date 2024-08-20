@@ -6,6 +6,7 @@ import '../../models/album.dart';
 import '../../models/asset.dart';
 import '../../models/asset_group.dart';
 import '../../models/endpoint.dart';
+import '../../models/log.dart';
 import '../../models/preferences.dart';
 import '../../models/user.dart';
 
@@ -50,9 +51,17 @@ class DatabaseService {
     }
   }
 
+  void _writeTxnSync<T>(T Function() callback, String origin) {
+    try {
+      _db.writeTxnSync(callback);
+    } on IsarError catch (e) {
+      throw DatabaseException(e.message, origin);
+    }
+  }
+
   /// Opens the database ready for reading and writing.
   Future<void> init() async {
-    if (_isar !=null){
+    if (_isar != null) {
       print('Database already open');
       return;
     }
@@ -64,6 +73,7 @@ class DatabaseService {
         AlbumSchema,
         AssetSchema,
         PreferencesSchema,
+        LogSchema,
       ], directory: dir.path);
     } catch (e) {
       throw DatabaseException('Failed to open the database.', 'init', '$e');
@@ -165,7 +175,12 @@ class DatabaseService {
     return _readTxn(
       () => album == null
           ? _db.assets.where().anyIsarId().sortByCreatedAtDesc().findAll()
-          : _db.assets.where().filter().albumsElementContains(album.id).sortByCreatedAtDesc().findAll(),
+          : _db.assets
+              .where()
+              .filter()
+              .albumsElementContains(album.id)
+              .sortByCreatedAtDesc()
+              .findAll(),
       'getAssets',
     );
   }
@@ -244,6 +259,49 @@ class DatabaseService {
       throw DatabaseException('Not authenticated', 'getAuthTokenSync');
     }
     return user.token;
+  }
+
+  Future<void> addLogs(List<Log> logs) async {
+    return _writeTxn(
+      () => _db.logs.putAll(logs),
+      'addLogs(async)',
+    );
+  }
+
+  void addLogsSync(List<Log> logs) {
+    print('Saving: ${logs.length}');
+    return _writeTxnSync(
+      () => _db.logs.putAllSync(logs),
+      'addLogsSync',
+    );
+  }
+
+  List<Log> getLogsSync() {
+    return _readTxnSync(
+      () => _db.logs.where().findAllSync(),
+      'getLogsSync',
+    );
+  }
+
+  Future<void> clearLogs() {
+    return _writeTxn(
+      () => _db.logs.clear(),
+      'clearLogs',
+    );
+  }
+
+  int logCount() {
+    return _readTxnSync(
+      () => _db.logs.countSync(),
+      'logCount',
+    );
+  }
+
+  void deleteLogs(int count) {
+    return _writeTxnSync(
+      () => _db.logs.where().limit(count).deleteAllSync(),
+      'deleteLogs',
+    );
   }
 }
 
