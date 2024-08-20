@@ -20,7 +20,6 @@ import '../../services/providers/app_bar_listener.dart';
 import 'asset_viewer_screen_state.dart';
 import 'video_viewer/video_viewer.dart';
 
-//TODO: Videos & stacked images.
 class AssetViewerWidget extends ConsumerStatefulWidget {
   const AssetViewerWidget({
     required this.viewerState,

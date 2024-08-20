@@ -686,7 +686,7 @@ class _MobileVideoPlayerControlsState extends State<MobileVideoPlayerControls> {
   MaterialVideoControlsThemeData _theme(BuildContext context) =>
       const MaterialVideoControlsThemeData(
         bottomButtonBar: [MaterialPositionIndicator()],
-        seekBarMargin: const EdgeInsets.symmetric(horizontal: 12),
+        seekBarMargin: EdgeInsets.symmetric(horizontal: 12),
       );
 }
 
@@ -694,10 +694,9 @@ class _BackwardSeekIndicator extends StatefulWidget {
   final void Function(Duration) onChanged;
   final void Function(Duration) onSubmitted;
   const _BackwardSeekIndicator({
-    Key? key,
     required this.onChanged,
     required this.onSubmitted,
-  }) : super(key: key);
+  });
 
   @override
   State<_BackwardSeekIndicator> createState() => _BackwardSeekIndicatorState();
@@ -781,10 +780,9 @@ class _ForwardSeekIndicator extends StatefulWidget {
   final void Function(Duration) onChanged;
   final void Function(Duration) onSubmitted;
   const _ForwardSeekIndicator({
-    Key? key,
     required this.onChanged,
     required this.onSubmitted,
-  }) : super(key: key);
+  });
 
   @override
   State<_ForwardSeekIndicator> createState() => _ForwardSeekIndicatorState();

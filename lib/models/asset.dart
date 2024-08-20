@@ -32,7 +32,6 @@ class Asset {
   final DateTime createdAt;
   final String fileName;
 
-  //TODO:
   final int? width;
   final int? height;
   final String? durationString;

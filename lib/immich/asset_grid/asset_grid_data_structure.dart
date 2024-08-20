@@ -287,7 +287,6 @@ class RenderList {
     while (true) {
       // this iterates all assets (only their createdAt property) in batches
       // memory usage is okay, however runtime is linear with number of assets
-      // TODO replace with groupBy once Isar supports such queries
       final dates = assets != null
           ? assets.map((a) => a.createdAt)
           : await query!

@@ -62,7 +62,6 @@ class DatabaseService {
   /// Opens the database ready for reading and writing.
   Future<void> init() async {
     if (_isar != null) {
-      print('Database already open');
       return;
     }
     try {
@@ -269,7 +268,6 @@ class DatabaseService {
   }
 
   void addLogsSync(List<Log> logs) {
-    print('Saving: ${logs.length}');
     return _writeTxnSync(
       () => _db.logs.putAllSync(logs),
       'addLogsSync',

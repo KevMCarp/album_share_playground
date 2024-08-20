@@ -339,7 +339,6 @@ class ApiService {
           ? await _extractObjectFromResponse(response) as T
           : await _extractObjectListFromResponse(response) as T;
     } on DioException catch (e, s) {
-      // TODO: log
       _logger.severe('Unexpected DioException', e, s);
       throw ApiException.fromDioException(e);
     }
@@ -438,8 +437,6 @@ enum ApiExceptionType {
     if (e.response?.statusCode != null) {
       return ApiExceptionType.fromCode(e.response!.statusCode!);
     }
-
-    print(e.type);
 
     return switch (e.type) {
       DioExceptionType.sendTimeout => ApiExceptionType.timeout,
