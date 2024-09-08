@@ -39,11 +39,11 @@ class AppRouter {
     return null;
   }
 
-  GoRouter get routerConfig => GoRouter(
+  GoRouter routerConfig({List<NavigatorObserver>? observers}) => GoRouter(
         routes: routes,
-        debugLogDiagnostics: true,
         navigatorKey: navigatorKey,
         restorationScopeId: 'router_config_scope',
+        observers: observers,
       );
 
   List<GoRoute> get routes => [
