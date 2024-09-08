@@ -34,4 +34,7 @@ final appInitProvider = FutureProvider((ref) async {
     logger.severe('PlatformDispatcher', error, stack);
     return true;
   };
+
+  final apiService = ref.watch(ApiProviders.service);
+  apiService.checkEndpoint();
 });

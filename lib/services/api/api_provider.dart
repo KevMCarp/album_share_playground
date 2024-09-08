@@ -1,9 +1,9 @@
-
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../database/database_providers.dart';
 import 'api_service.dart';
 
 abstract class ApiProviders {
@@ -33,6 +33,7 @@ abstract class ApiProviders {
     return ApiService(
       ref.watch(_dio),
       ref.watch(_cookieJar),
+      ref.watch(DatabaseProviders.service),
     );
   });
 }

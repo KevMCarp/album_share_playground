@@ -13,16 +13,18 @@ import '../../models/asset.dart';
 import '../../models/endpoint.dart';
 import '../../models/json_map.dart';
 import '../../models/user.dart';
+import '../database/database_service.dart';
 
 const _applicationJson = 'application/json';
 
 final _logger = Logger('ApiService');
 
 class ApiService {
-  const ApiService(this._dio, this._cookieJar);
+  const ApiService(this._dio, this._cookieJar, this._database);
 
   final Dio _dio;
   final CookieJar _cookieJar;
+  final DatabaseService _database;
 
   Future<Endpoint> checkAndSetEndpoint(String serverUrl) async {
     final available = await _isEndpointAvailable(serverUrl);
@@ -35,23 +37,41 @@ class ApiService {
       );
     }
 
+    _setServerUrl(serverUrl);
     _logger.info('Endpoint $serverUrl set');
 
-    _dio.options.baseUrl = serverUrl;
-    _dio.options.headers = {'Accept': _applicationJson};
-
-    _dio.interceptors.clear();
-    _dio.interceptors.add(CookieManager(_cookieJar));
-
     final isOAuth = await _checkIsOAuth();
-
     _logger.info('Endpoint is oAuth: $isOAuth');
 
     return Endpoint(serverUrl, isOAuth);
   }
 
+  void _setServerUrl(String serverUrl) {
+    _dio.options.baseUrl = serverUrl;
+    _dio.options.headers = {'Accept': _applicationJson};
+
+    _dio.interceptors.clear();
+    _dio.interceptors.add(CookieManager(_cookieJar));
+  }
+
+  Future<bool> _getEndpointFromStorage() async {
+    if (_dio.options.baseUrl.isEmpty) {
+      final endpoint = await _database.getEndpoint();
+      if (endpoint != null) {
+        _setServerUrl(endpoint.serverUrl);
+        return true;
+      }
+    }
+    return false;
+  }
+
   /// Checks the already set endpoint to see if it is currently reachable.
   Future<bool> checkEndpoint() async {
+    final endpointFound = await _getEndpointFromStorage();
+    if (!endpointFound) {
+      return false;
+    }
+
     final available = await _isEndpointAvailable('');
 
     if (!available) {
