@@ -5,6 +5,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../services/library/library_providers.dart';
 import '../../utils/extension_methods.dart';
+import '../../utils/platform_utils.dart';
+
+class MaybeRefreshButton extends StatelessWidget {
+  const MaybeRefreshButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return forPlatform(
+      desktop: () => const RefreshButton(),
+      mobile: () => const SizedBox(),
+    );
+  }
+}
 
 class RefreshButton extends ConsumerStatefulWidget {
   const RefreshButton({super.key});

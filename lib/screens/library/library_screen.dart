@@ -17,7 +17,7 @@ class LibraryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppScaffold(
       showTitleBar: true,
-      titleBarIcons: const [RefreshButton(), PreferencesButton()],
+      titleBarIcons: const [MaybeRefreshButton(), PreferencesButton()],
       body: Center(
         child: Consumer(builder: (context, ref, child) {
           final libraryProvider = ref.watch(LibraryProviders.state);
@@ -59,8 +59,12 @@ class LibraryScreen extends StatelessWidget {
                         showStack: true,
                         renderList: renderList,
                         assetMaxExtent: maxExtent,
-                        onRefresh: () =>
-                            ref.read(LibraryProviders.state.notifier).update(),
+                        onRefresh: platformValue(
+                          desktop: null,
+                          mobile: () async {
+                            ref.read(LibraryProviders.state.notifier).update();
+                          }
+                        ),
                       ),
                     ),
                   );

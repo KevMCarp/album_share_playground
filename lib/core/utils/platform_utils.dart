@@ -15,3 +15,19 @@ T forPlatform<T>({
       return desktop();
   }
 }
+
+T? platformValue<T>({
+  required T? desktop,
+required T? mobile,
+}) {
+  switch(defaultTargetPlatform) {
+    case TargetPlatform.android:
+    case TargetPlatform.iOS:
+    case TargetPlatform.fuchsia:
+      return mobile;
+    case TargetPlatform.linux:
+    case TargetPlatform.macOS:
+    case TargetPlatform.windows:
+      return desktop;
+  }
+}

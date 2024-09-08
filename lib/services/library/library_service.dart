@@ -51,9 +51,9 @@ class LibraryService extends StateNotifier<LibraryState> {
   Future<void> update() async {
     late bool albumFetchFailed;
 
-    final onlineAlbums = await _api.getSharedAlbums().then((a) {
+    final onlineAlbums = await _api.getSharedAlbums().then((albums) {
       albumFetchFailed = false;
-      return a;
+      return albums;
     }).onError((ApiException e, _) {
       albumFetchFailed = true;
       return [];
