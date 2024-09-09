@@ -255,6 +255,24 @@ class ApiService {
         .toList();
   }
 
+  Future<Uint8List> downloadVideoData(
+    String assetId,
+    void Function(int count, int total) onProgress,
+  ) async {
+    final response = await _dio.get(
+      '/api/assets/$assetId/video/playback',
+      queryParameters: {'Accept': 'application/octet-stream'},
+      onReceiveProgress: onProgress,
+    );
+
+    if (response.data is String) {
+      final data = const Utf8Encoder().convert(response.data);
+      return data;
+    }
+
+    return response.data;
+  }
+
   /// Ensures the server url has been set via a call to [checkAndSetEndpoint]
   void _expectEndpointSet() {
     if (_dio.options.baseUrl.isEmpty) {

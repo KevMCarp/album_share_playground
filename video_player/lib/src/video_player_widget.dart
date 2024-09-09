@@ -28,6 +28,16 @@ class VideoPlayer extends StatefulWidget {
     super.key,
   }) : media = Media(url, httpHeaders: headers);
 
+  VideoPlayer.asset({
+    required String path,
+    this.loop = true,
+    this.autoPlay = true,
+    this.showControls = true,
+    this.onControlsViewChanged,
+    this.onReady,
+    super.key,
+  }) : media = Media('file://$path');
+
   final Media media;
 
   final bool loop;

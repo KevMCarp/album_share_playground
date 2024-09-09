@@ -18,7 +18,7 @@ import '../../routes/app_router.dart';
 import '../../services/preferences/preferences_providers.dart';
 import '../../services/providers/app_bar_listener.dart';
 import 'asset_viewer_screen_state.dart';
-import 'video_viewer/video_viewer.dart';
+import 'video_viewer/asset_video_viewer.dart';
 
 class AssetViewerWidget extends ConsumerStatefulWidget {
   const AssetViewerWidget({
@@ -264,10 +264,9 @@ class _AssetViewerWidgetState extends ConsumerState<AssetViewerWidget> {
               maxScale: 1.0,
               minScale: 1.0,
               basePosition: Alignment.center,
-              child: VideoViewer(
+              child: AssetVideoViewer(
                 key: ValueKey(a),
                 asset: a,
-                isMotionVideo: a.livePhotoVideoId != null,
                 loopVideo: shouldLoopVideo,
                 placeholder: Image(
                   image: provider,

@@ -1,6 +1,6 @@
-import 'package:album_share/core/utils/extension_methods.dart';
 import 'package:isar/isar.dart';
 
+import '../core/utils/extension_methods.dart';
 import 'json_map.dart';
 
 part 'asset.g.dart';
@@ -71,6 +71,12 @@ class Asset {
       thumbHash: thumbHash,
       livePhotoVideoId: livePhotoVideoId,
     );
+  }
+
+  String videoUrl(String serverUrl) {
+    return livePhotoVideoId != null
+        ? '$serverUrl/api/assets/$livePhotoVideoId/video/playback'
+        : '$serverUrl/api/assets/$id/video/playback';
   }
 
   @ignore
