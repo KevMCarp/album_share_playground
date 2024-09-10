@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:go_router/go_router.dart';
 
 import '../components/focus_remover.dart';
@@ -68,7 +69,8 @@ class PlatformApp extends StatelessWidget {
           title: title,
           theme: CupertinoThemeData(
               brightness: switch (mode) {
-            ThemeMode.system => null,
+            ThemeMode.system =>
+              SchedulerBinding.instance.platformDispatcher.platformBrightness,
             ThemeMode.light => Brightness.light,
             ThemeMode.dark => Brightness.dark,
           }),
