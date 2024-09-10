@@ -41,6 +41,8 @@ class DesktopWindowTitlebar extends StatelessWidget {
     return WindowTitleBarBox(
       child: Row(
         children: [
+          if (defaultTargetPlatform == TargetPlatform.macOS)
+            const SizedBox(width: 65),
           Expanded(
             child: MoveWindow(
               child: showTitle
