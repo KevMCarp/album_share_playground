@@ -36,5 +36,5 @@ final appInitProvider = FutureProvider((ref) async {
   };
 
   final apiService = ref.watch(ApiProviders.service);
-  apiService.checkEndpoint();
+  await apiService.checkEndpoint();
 });

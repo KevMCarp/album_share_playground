@@ -55,7 +55,7 @@ class AuthService {
     } on ApiException catch (_) {
       // User previously logged in, currently offline so assume authenticated still.
       // This avoids redirect to login screen when offline.
-      return true;
+      return _api.isEndpointSet();
     }
   }
 
