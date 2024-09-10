@@ -75,7 +75,13 @@ class AppRouter {
   static void to(String route, BuildContext context) =>
       GoRouter.of(context).go(route.startsWith('/') ? route : '/$route');
 
-  static void back(BuildContext context) => GoRouter.of(context).pop();
+  static void back(BuildContext context) {
+    try {
+      GoRouter.of(context).pop();
+    } on GoError {
+      // GoRouter throws on macOS when calling pop.
+    }
+  }
 
   static void toLibrary(BuildContext context) => to(_kLibraryRoute, context);
   static void toPreferences(BuildContext context) =>
