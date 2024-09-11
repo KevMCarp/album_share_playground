@@ -5,6 +5,7 @@ import '../../core/components/scaffold/app_scaffold.dart';
 import '../../core/utils/app_localisations.dart';
 import '../../services/preferences/preferences_notifier.dart';
 import '../../services/preferences/preferences_providers.dart';
+import 'assets/dynamic_layout_widget.dart';
 import 'assets/group_by_widget.dart';
 import 'assets/loop_videos_widget.dart';
 import 'assets/max_extent_widget.dart';
@@ -74,10 +75,10 @@ class PreferencesWidget extends ConsumerWidget {
           value: preferences.groupBy,
           onChanged: (v) => _service(ref).setValue(groupBy: v),
         ),
-        // DynamicLayoutWidget(
-        //   value: preferences.dynamicLayout,
-        //   onChanged: (v) => _service(ref).setValue(dynamicLayout: v),
-        // ),
+        DynamicLayoutWidget(
+          value: preferences.dynamicLayout,
+          onChanged: (v) => _service(ref).setValue(dynamicLayout: v),
+        ),
         LoopVideosWidget(
           value: preferences.loopVideos,
           onChanged: (v) => _service(ref).setValue(loopVideos: v),
