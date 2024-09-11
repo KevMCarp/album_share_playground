@@ -143,6 +143,21 @@ class DatabaseService {
     );
   }
 
+  /// Returns true if a user object is found within the database,
+  /// otherwise returns false.
+  ///
+  /// Throws [DatabaseException] if the operation fails.
+  Future<bool> userExists() async {
+    try {
+      final count = await _db.txn(() {
+        return _db.users.count();
+      });
+      return count > 0;
+    } on IsarError catch (e) {
+      throw DatabaseException(e.message, 'userExists');
+    }
+  }
+
   /// Inserts or updates the current user.
   ///
   /// Throws [DatabaseException] if the operation fails.
@@ -184,11 +199,41 @@ class DatabaseService {
     );
   }
 
+  /// Listens to a list of assets for the selected album.
+  ///
+  /// If album is null, all albums are listened to.
+  Stream<List<Asset>> assetStream([Album? album]) {
+    return _readTxnSync(
+      () => album == null
+          ? _db.assets
+              .where()
+              .anyIsarId()
+              .sortByCreatedAtDesc()
+              .watch(fireImmediately: true)
+          : _db.assets
+              .where()
+              .filter()
+              .albumsElementContains(album.id)
+              .sortByCreatedAtDesc()
+              .watch(fireImmediately: true),
+      'assetStream',
+    );
+  }
+
   List<Asset> allAssetsSync() {
     return _readTxnSync(
       () => _db.assets.where().anyIsarId().sortByCreatedAtDesc().findAllSync(),
       'allAssetsSync',
     );
+  }
+
+  /// Checks if any assets have been stored in the offline db.
+  bool haveAssetsSync() {
+    final count = _readTxnSync(
+      () => _db.assets.countSync(),
+      'haveAssetsSync',
+    );
+    return count > 0;
   }
 
   /// Retrieves assets for the passed [AssetGroup]

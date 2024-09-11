@@ -52,10 +52,13 @@ class AuthService {
   Future<bool> checkAuthStatus() async {
     try {
       return await _api.validateAuthToken();
-    } on ApiException catch (_) {
+    } on ApiException catch (e) {
       // User previously logged in, currently offline so assume authenticated still.
       // This avoids redirect to login screen when offline.
-      return _api.isEndpointSet();
+      if (e.type == ApiExceptionType.timeout) {
+        return await _db.userExists();
+      }
+      return false;
     }
   }
 
