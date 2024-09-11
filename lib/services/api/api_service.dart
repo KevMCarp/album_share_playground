@@ -65,10 +65,6 @@ class ApiService {
     return false;
   }
 
-  bool isEndpointSet() {
-    return _dio.options.baseUrl.isNotEmpty;
-  }
-
   /// Checks the already set endpoint to see if it is currently reachable.
   Future<bool> checkEndpoint() async {
     final endpointFound = await _getEndpointFromStorage();
