@@ -11,6 +11,7 @@ import 'assets/loop_videos_widget.dart';
 import 'assets/max_extent_widget.dart';
 import 'assets/original_image_widget.dart';
 import 'assets/preview_image_widget.dart';
+import 'assets/sync_frequency_widget.dart';
 import 'general/haptic_feedback_widget.dart';
 import 'general/theme_widget.dart';
 import 'support/log_widget.dart';
@@ -74,6 +75,10 @@ class PreferencesWidget extends ConsumerWidget {
         GroupByWidget(
           value: preferences.groupBy,
           onChanged: (v) => _service(ref).setValue(groupBy: v),
+        ),
+        SyncFrequencyWidget(
+          value: preferences.syncFrequency,
+          onChanged: (v) => _service(ref).setValue(syncFrequency: v),
         ),
         DynamicLayoutWidget(
           value: preferences.dynamicLayout,
