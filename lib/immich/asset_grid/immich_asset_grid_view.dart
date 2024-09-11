@@ -222,7 +222,7 @@ class ImmichAssetGridViewState extends ConsumerState<ImmichAssetGridView> {
       saveOffset();
       return _hideAppBar();
     }
-    if (firstInView.index < _indexInView) {
+    if (firstInView.index < _indexInView || firstInView.index < 1) {
       saveIndex();
       saveOffset();
       return _showAppBar();
