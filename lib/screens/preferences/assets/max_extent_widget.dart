@@ -49,7 +49,7 @@ class _MaxExtentWidgetState extends State<MaxExtentWidget> {
             padding: padding,
             child: Text(locale.thumbnailMaxWidthDescription),
           ),
-          Slider(
+          Slider.adaptive(
             min: 60,
             max: 300,
             divisions: sliderSteps,

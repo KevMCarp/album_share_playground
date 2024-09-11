@@ -36,13 +36,20 @@ class DesktopWindowTitlebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    assert(desktopPlatforms.contains(defaultTargetPlatform));
+    final platform = Theme.of(context).platform;
+    assert(desktopPlatforms.contains(platform));
+
+    if (platform == TargetPlatform.macOS) {
+      return _CupertinoWindowTitlebar(
+        showTitle: showTitle,
+        titleBarIcons: titleBarIcons,
+        leading: leading,
+      );
+    }
 
     return WindowTitleBarBox(
       child: Row(
         children: [
-          if (defaultTargetPlatform == TargetPlatform.macOS)
-            const SizedBox(width: 65),
           Expanded(
             child: MoveWindow(
               child: showTitle
@@ -71,6 +78,48 @@ class DesktopWindowTitlebar extends StatelessWidget {
               AppLogger.instance.flush();
               appWindow.close();
             },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CupertinoWindowTitlebar extends StatelessWidget {
+  const _CupertinoWindowTitlebar({
+    required this.showTitle,
+    required this.titleBarIcons,
+    required this.leading,
+  });
+
+  final bool showTitle;
+  final List<Widget> titleBarIcons;
+  final Widget? leading;
+
+  @override
+  Widget build(BuildContext context) {
+    return WindowTitleBarBox(
+      child: Row(
+        children: [
+          const SizedBox(width: 65),
+          if (leading != null) leading!,
+          Expanded(
+            child: MoveWindow(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ...titleBarIcons,
+                  const Padding(
+                    padding: EdgeInsets.all(4.0),
+                    child: SizedBox(
+                      height: 16,
+                      child: LogoImage(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),

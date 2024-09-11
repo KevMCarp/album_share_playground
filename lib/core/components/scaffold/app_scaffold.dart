@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../screens/auth/auth_listener.dart';
 import '../../utils/platform_utils.dart';
 import 'desktop_scaffold.dart';
 import 'mobile_scaffold.dart';
@@ -33,7 +34,7 @@ class AppScaffold extends StatelessWidget {
           showTitleBar: showTitleBar,
           titleBarIcons: titleBarIcons,
           showBackButton: showBackButton,
-          body: body,
+          body: AuthListener(child: body),
         );
       },
       mobile: () {
@@ -41,7 +42,7 @@ class AppScaffold extends StatelessWidget {
           showTitleBar: showTitleBar,
           titleBarIcons: titleBarIcons,
           showBackButton: showBackButton,
-          body: body,
+          body: AuthListener(child: body),
         );
       },
     );

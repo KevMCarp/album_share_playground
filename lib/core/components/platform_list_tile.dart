@@ -23,6 +23,7 @@ class PlatformSwitchListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return ListTile(
       title: title,
       subtitle: subtitle,
@@ -30,9 +31,12 @@ class PlatformSwitchListTile extends StatelessWidget {
       onTap: () => onChanged(!value),
       trailing: Transform.scale(
         scale: forPlatform(desktop: () => 0.8, mobile: () => 1.0),
-        child: Switch(
+        child: Switch.adaptive(
           value: value,
           onChanged: onChanged,
+          activeColor: theme.platform == TargetPlatform.macOS
+              ? Theme.of(context).colorScheme.primary
+              : null,
         ),
       ),
     );
