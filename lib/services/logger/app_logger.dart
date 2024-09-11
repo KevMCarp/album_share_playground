@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 
 import '../../core/utils/extension_methods.dart';
@@ -25,6 +26,9 @@ class AppLogger {
   Timer? _timer;
 
   void _writeLog(LogRecord record) {
+    if (kDebugMode) {
+      print(record.toString());
+    }
     _logBuffer.add(Log.fromRecord(record));
     _timer?.cancel();
     _timer ??= Timer(5.seconds, flush);
