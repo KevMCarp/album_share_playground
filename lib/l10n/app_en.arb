@@ -69,7 +69,17 @@
     "logs": "Logs",
     "close": "Close",
     "clipboardSave": "Saved to clipboard",
-    "support" : "Support"
+    "support" : "Support",
+    "syncFrequency": "Sync Frequency",
+    "syncFrequencyDescription": "How often to check for new assets and activity.",
+    "fiveMinutes": "5 Minutes",
+    "fifteenMinutes": "15 Minutes",
+    "thirtyMinutes" : "30 Minutes",
+    "oneHour": "1 Hour",
+    "twoHours" : "2 Hours",
+    "fourHours": "4 Hours",
+    "eightHours" : "8 Hours",
+    "twelveHours": "12 Hours"
 
 
 }
