@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../models/album.dart';
+import '../screens/album/album_screen.dart';
 import '../screens/asset_viewer/asset_viewer_screen.dart';
 import '../screens/asset_viewer/asset_viewer_screen_state.dart';
 import '../screens/auth/auth_screen.dart';
@@ -12,10 +14,7 @@ const _kLibraryRoute = '/';
 const _kLoginRoute = '/login';
 const _kPreferencesRoute = 'preferences';
 const _kAssetViewerRoute = 'assets';
-
-final router = GoRouter(
-  routes: [],
-);
+const _kAlbumRote = 'album';
 
 class AppRouter {
   AppRouter(this._auth);
@@ -87,6 +86,8 @@ class AppRouter {
   static void toPreferences(BuildContext context) =>
       to(_kPreferencesRoute, context);
   static void toLogin(BuildContext context) => to(_kLoginRoute, context);
+  static void toAlbum(BuildContext context, Album album) =>
+      to(_kAlbumRote, context, album);
   static void toAssetViewer(
     BuildContext context,
     AssetViewerScreenState viewerState,

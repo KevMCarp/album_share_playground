@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:octo_image/octo_image.dart';
 
 import '../../core/components/scaffold/app_navigation_scaffold.dart';
 import '../../core/components/scaffold/app_scaffold.dart';
@@ -9,6 +10,9 @@ import '../../core/components/titlebar_buttons/refresh_button.dart';
 import '../../core/utils/app_localisations.dart';
 import '../../core/utils/platform_utils.dart';
 import '../../immich/asset_grid/immich_asset_grid_view.dart';
+import '../../immich/asset_grid/immich_thumbnail.dart';
+import '../../models/album.dart';
+import '../../routes/app_router.dart';
 import '../../services/foreground/foreground_service_provider.dart';
 import '../../services/library/library_providers.dart';
 import '../../services/preferences/preferences_providers.dart';
@@ -56,70 +60,146 @@ class _AllAssetsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-        child: Consumer(builder: (context, ref, child) {
-          final syncService = ref.watch(foregroundServiceProvider);
+      child: Consumer(builder: (context, ref, child) {
+        final syncService = ref.watch(foregroundServiceProvider);
 
-          if (syncService.firstRun && !syncService.assets) {
+        if (syncService.firstRun && !syncService.assets) {
           return const BuildingLibraryWidget();
-          }
+        }
 
-          final libraryProvider = ref.watch(LibraryProviders.assets);
+        final libraryProvider = ref.watch(LibraryProviders.assets);
 
-          return libraryProvider.when(
-            data: (assets) {
-              final maxExtent = ref.watch(PreferencesProviders.maxExtent);
+        return libraryProvider.when(
+          data: (assets) {
+            final maxExtent = ref.watch(PreferencesProviders.maxExtent);
             final dynamicLayout = ref.watch(PreferencesProviders.dynamicLayout);
-              final renderList = ref.watch(LibraryProviders.renderList(assets));
+            final renderList = ref.watch(LibraryProviders.renderList(assets));
 
-              return renderList.when(
-                data: (renderList) {
-                  return Padding(
-                    padding: const EdgeInsets.only(left: 4),
-                    child: ScrollConfiguration(
-                      // Remove default scroll bar
-                      behavior: ScrollConfiguration.of(context)
-                          .copyWith(scrollbars: false),
-                      child: ImmichAssetGridView(
-                        alwaysVisibleScrollThumb: forPlatform(
-                          desktop: () => true,
-                          mobile: () => false,
-                        ),
-                        dynamicLayout: dynamicLayout,
-                        showStack: true,
-                        renderList: renderList,
-                        assetMaxExtent: maxExtent,
-                        onRefresh: platformValue(
-                          desktop: null,
-                          mobile: () => _refresh(ref),
-                        ),
+            return renderList.when(
+              data: (renderList) {
+                return Padding(
+                  padding: const EdgeInsets.only(left: 4),
+                  child: ScrollConfiguration(
+                    // Remove default scroll bar
+                    behavior: ScrollConfiguration.of(context)
+                        .copyWith(scrollbars: false),
+                    child: ImmichAssetGridView(
+                      alwaysVisibleScrollThumb: forPlatform(
+                        desktop: () => true,
+                        mobile: () => false,
+                      ),
+                      dynamicLayout: dynamicLayout,
+                      showStack: true,
+                      renderList: renderList,
+                      assetMaxExtent: maxExtent,
+                      onRefresh: platformValue(
+                        desktop: null,
+                        mobile: () => _refresh(ref),
+                      ),
                       onTap: (state) {
                         AppRouter.toAssetViewer(context, state);
                       },
-                      ),
                     ),
-                  );
-                },
-                error: (e, _) => Text('$e'),
-                loading: () => const Center(
-                  child: CircularProgressIndicator(),
-                ),
-                skipLoadingOnReload: true,
-                skipLoadingOnRefresh: true,
-              );
-            },
-            error: (e, _) {
-              return Center(
-                child: Text('$e'),
-              );
-            },
-            loading: () {
-              return const SizedBox();
-            },
-          );
-        }),
+                  ),
+                );
+              },
+              error: (e, _) => Text('$e'),
+              loading: () => const Center(
+                child: CircularProgressIndicator(),
+              ),
+              skipLoadingOnReload: true,
+              skipLoadingOnRefresh: true,
+            );
+          },
+          error: (e, _) {
+            return Center(
+              child: Text('$e'),
+            );
+          },
+          loading: () {
+            return const SizedBox();
+          },
+        );
+      }),
     );
   }
 }
+
+class _AlbumsScreen extends ConsumerWidget {
+  const _AlbumsScreen({super.key});
+
+  void _onTap(BuildContext context, Album album) {
+    AppRouter.toAlbum(context, album);
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final syncService = ref.watch(foregroundServiceProvider);
+
+    if (syncService.firstRun && !syncService.assets) {
+      return const BuildingLibraryWidget();
+    }
+
+    final albumsProvider = ref.watch(LibraryProviders.albums);
+
+    return albumsProvider.when(
+      data: (albums) {
+        return GridView.builder(
+          itemCount: albums.length,
+          itemBuilder: (context, index) {
+            final album = albums[index];
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => _onTap(context, album),
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                      child: OctoImage(
+                        placeholderFadeInDuration: Duration.zero,
+                        fadeInDuration: Duration.zero,
+                        fadeOutDuration: const Duration(milliseconds: 100),
+                        // octoSet: blurHashOrPlaceholder(blurhash),
+                        image: ImmichThumbnail.imageProvider(
+                          assetId: album.thumbnailId,
+                        ),
+                        fit: BoxFit.cover,
+                        width: 200,
+                        height: 200,
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Text(album.name, maxLines: 1),
+                )
+              ],
+            );
+          },
+          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 200,
+            childAspectRatio: 1,
+            crossAxisSpacing: 4,
+            mainAxisSpacing: 4,
+          ),
+          padding: EdgeInsets.symmetric(
+              vertical: AppScaffold.appBarHeight(context), horizontal: 4),
+        );
+      },
+      error: (e, _) {
+        return Center(
+          child: Text('$e'),
+        );
+      },
+      loading: () {
+        return const SizedBox();
+      },
+    );
+  }
+}
+
 class BuildingLibraryWidget extends StatelessWidget {
   const BuildingLibraryWidget({super.key});
 

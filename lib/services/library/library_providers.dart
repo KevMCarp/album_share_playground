@@ -51,4 +51,8 @@ abstract class LibraryProviders {
       FutureProvider.autoDispose.family<Uint8List, Asset>(
     (ref, asset) => ref.watch(FileService.provider).fetch(asset, preview: true),
   );
+  static final albums = StreamProvider.autoDispose((ref) {
+    final db = ref.watch(DatabaseProviders.service);
+    return db.albumsStream();
+  });
 }
