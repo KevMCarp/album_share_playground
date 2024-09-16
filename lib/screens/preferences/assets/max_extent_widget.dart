@@ -39,16 +39,12 @@ class _MaxExtentWidgetState extends State<MaxExtentWidget> {
       isThreeLine: true,
       title: Padding(
         padding: padding,
-        child: Text(locale.thumbnailMaxWidth),
+        child: Text(locale.thumbnailWidth),
       ),
       contentPadding: const EdgeInsets.all(0),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: padding,
-            child: Text(locale.thumbnailMaxWidthDescription),
-          ),
           Slider.adaptive(
             min: 60,
             max: 300,
