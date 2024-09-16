@@ -1,5 +1,8 @@
 import 'package:flutter/foundation.dart';
 
+bool isCupertino = defaultTargetPlatform == TargetPlatform.iOS ||
+    defaultTargetPlatform == TargetPlatform.macOS;
+
 T forPlatform<T>({
   required T Function() desktop,
   required T Function() mobile,
@@ -18,9 +21,9 @@ T forPlatform<T>({
 
 T? platformValue<T>({
   required T? desktop,
-required T? mobile,
+  required T? mobile,
 }) {
-  switch(defaultTargetPlatform) {
+  switch (defaultTargetPlatform) {
     case TargetPlatform.android:
     case TargetPlatform.iOS:
     case TargetPlatform.fuchsia:
