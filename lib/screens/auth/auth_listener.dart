@@ -16,8 +16,10 @@ class AuthListener extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(AuthProviders.userStream);
 
-    user.whenData((_) {
-      ref.watch(foregroundServiceProvider);
+    user.whenData((u) {
+      if (u != null) {
+        ref.watch(foregroundServiceProvider);
+      }
     });
 
     return child;
