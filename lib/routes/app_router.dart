@@ -45,23 +45,32 @@ class AppRouter {
         observers: observers,
       );
 
+  final _assetViewerRoute = GoRoute(
+    path: _kAssetViewerRoute,
+    builder: (_, state) => AssetViewerScreen(
+      viewerState: state.extra as AssetViewerScreenState,
+    ),
+  );
+
+  final _preferencesRoute = GoRoute(
+    path: _kPreferencesRoute,
+    builder: (_, __) => const PreferencesScreen(),
+  );
+
+  late final _albumRoute = GoRoute(
+      path: _kAlbumRote,
+      builder: (_, state) => AlbumScreen(album: state.extra as Album),
+      routes: [_assetViewerRoute, _preferencesRoute]);
+
   List<GoRoute> get routes => [
         GoRoute(
           path: _kLibraryRoute,
           builder: (_, __) => const LibraryScreen(),
           redirect: (_, __) => _authRedirect(true),
           routes: [
-            GoRoute(
-              path: _kPreferencesRoute,
-              builder: (_, __) => const PreferencesScreen(),
-            ),
-            GoRoute(
-              path: _kAssetViewerRoute,
-              builder: (_, state) => AssetViewerScreen(
-                viewerState:
-                    AssetViewerScreenState.fromExtra(state.extra ?? {}),
-              ),
-            ),
+            _assetViewerRoute,
+            _preferencesRoute,
+            _albumRoute,
           ],
         ),
         GoRoute(
@@ -71,8 +80,9 @@ class AppRouter {
         ),
       ];
 
-  static void to(String route, BuildContext context) =>
-      GoRouter.of(context).go(route.startsWith('/') ? route : '/$route');
+  static void to(String route, BuildContext context, [Object? extra]) =>
+      GoRouter.of(context)
+          .push(route.startsWith('/') ? route : '/$route', extra: extra);
 
   static void back(BuildContext context) {
     try {
@@ -92,8 +102,5 @@ class AppRouter {
     BuildContext context,
     AssetViewerScreenState viewerState,
   ) =>
-      GoRouter.of(context).go(
-        '/$_kAssetViewerRoute',
-        extra: viewerState.toExtra(),
-      );
+      to(_kAssetViewerRoute, context, viewerState);
 }
