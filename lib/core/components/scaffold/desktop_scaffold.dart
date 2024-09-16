@@ -14,6 +14,7 @@ class DesktopScaffold extends ConsumerWidget {
     this.header,
     this.showBackButton = false,
     required this.body,
+    this.bottomNavigationBar,
     super.key,
   });
 
@@ -31,12 +32,13 @@ class DesktopScaffold extends ConsumerWidget {
 
   final Widget body;
 
+  final Widget? bottomNavigationBar;
+
   static double appBarHeight() => _appBarHeight;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appBarVisible = ref.watch(appBarListenerProvider);
-    final theme = Theme.of(context);
 
     return Scaffold(
       body: Stack(
@@ -52,9 +54,6 @@ class DesktopScaffold extends ConsumerWidget {
               opaque: false,
               child: SizedBox(
                 height: _appBarHeight,
-                color: (theme.appBarTheme.backgroundColor ??
-                        theme.colorScheme.surface)
-                    .withOpacity(0.6),
                 child: DesktopWindowTitlebar(
                   showTitle: showTitleBar,
                   titleBarIcons: titleBarIcons,
@@ -64,7 +63,14 @@ class DesktopScaffold extends ConsumerWidget {
               ),
             ),
           ),
-          ),
+          if (bottomNavigationBar != null)
+            AnimatedPositioned(
+              duration: kThemeAnimationDuration,
+              left: 0,
+              right: 0,
+              bottom: appBarVisible ? 0 : -kBottomNavigationBarHeight,
+              child: bottomNavigationBar!,
+            ),
         ],
       ),
     );

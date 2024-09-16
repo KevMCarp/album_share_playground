@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../services/providers/app_bar_listener.dart';
 import '../logo_widget.dart';
+import '../navigation_bar/material_navigation_bar.dart';
 import '../titlebar_buttons/titlebar_back_button.dart';
 
 class MobileScaffold extends ConsumerWidget {
@@ -12,6 +13,7 @@ class MobileScaffold extends ConsumerWidget {
     this.header,
     this.showBackButton = false,
     required this.body,
+    this.bottomNavigationBar,
     super.key,
   });
 
@@ -28,6 +30,8 @@ class MobileScaffold extends ConsumerWidget {
   final bool showBackButton;
 
   final Widget body;
+
+  final Widget? bottomNavigationBar;
 
   static double appBarHeight(BuildContext context) =>
       kToolbarHeight + MediaQuery.of(context).padding.top;
@@ -77,6 +81,13 @@ class MobileScaffold extends ConsumerWidget {
                 ),
               ),
             ),
+          if (bottomNavigationBar != null)
+            AnimatedPositioned(
+              duration: kThemeAnimationDuration,
+              left: 0,
+              right: 0,
+              bottom: appBarVisible ? 0 : -kBottomNavBarHeight,
+              child: bottomNavigationBar!,
             ),
         ],
       ),

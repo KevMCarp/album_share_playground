@@ -12,6 +12,7 @@ class AppScaffold extends StatelessWidget {
     this.header,
     this.showBackButton = false,
     required this.body,
+    this.bottomNavigationBar,
     super.key,
   });
 
@@ -30,6 +31,8 @@ class AppScaffold extends StatelessWidget {
 
   final Widget body;
 
+  final Widget? bottomNavigationBar;
+
   @override
   Widget build(BuildContext context) {
     return forPlatform(
@@ -39,6 +42,7 @@ class AppScaffold extends StatelessWidget {
           titleBarIcons: titleBarIcons,
           showBackButton: showBackButton,
           body: AuthListener(child: body),
+          bottomNavigationBar: bottomNavigationBar,
           header: header,
         );
       },
@@ -48,6 +52,7 @@ class AppScaffold extends StatelessWidget {
           titleBarIcons: titleBarIcons,
           showBackButton: showBackButton,
           body: AuthListener(child: body),
+          bottomNavigationBar: bottomNavigationBar,
           header: header,
         );
       },
