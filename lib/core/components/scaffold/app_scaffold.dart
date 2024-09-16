@@ -9,6 +9,7 @@ class AppScaffold extends StatelessWidget {
   const AppScaffold({
     required this.showTitleBar,
     this.titleBarIcons = const [],
+    this.header,
     this.showBackButton = false,
     required this.body,
     super.key,
@@ -19,6 +20,9 @@ class AppScaffold extends StatelessWidget {
 
   /// title bar icons will only be shown if showTitleBar is set to true.
   final List<Widget> titleBarIcons;
+
+  /// A replacement for the app title.
+  final String? header;
 
   /// If [showTitleBar] and [showBackButton] are true, the back button
   /// will be shown on the title bar.
@@ -35,6 +39,7 @@ class AppScaffold extends StatelessWidget {
           titleBarIcons: titleBarIcons,
           showBackButton: showBackButton,
           body: AuthListener(child: body),
+          header: header,
         );
       },
       mobile: () {
@@ -43,6 +48,7 @@ class AppScaffold extends StatelessWidget {
           titleBarIcons: titleBarIcons,
           showBackButton: showBackButton,
           body: AuthListener(child: body),
+          header: header,
         );
       },
     );

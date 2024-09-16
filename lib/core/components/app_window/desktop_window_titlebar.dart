@@ -1,8 +1,8 @@
-import 'package:album_share/services/logger/app_logger.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../../../services/logger/app_logger.dart';
 import '../logo_widget.dart';
 import 'app_window.dart';
 
@@ -10,11 +10,14 @@ class DesktopWindowTitlebar extends StatelessWidget {
   const DesktopWindowTitlebar({
     this.showTitle = true,
     this.leading,
+    this.header,
     this.titleBarIcons = const [],
     super.key,
   });
 
   final Widget? leading;
+
+  final String? header;
 
   final List<Widget> titleBarIcons;
 
@@ -36,7 +39,8 @@ class DesktopWindowTitlebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final platform = Theme.of(context).platform;
+    final theme = Theme.of(context);
+    final platform = theme.platform;
     assert(desktopPlatforms.contains(platform));
 
     if (platform == TargetPlatform.macOS) {
@@ -44,42 +48,48 @@ class DesktopWindowTitlebar extends StatelessWidget {
         showTitle: showTitle,
         titleBarIcons: titleBarIcons,
         leading: leading,
+        header: header,
       );
     }
 
-    return WindowTitleBarBox(
-      child: Row(
-        children: [
-          Expanded(
-            child: MoveWindow(
-              child: showTitle
-                  ? Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.all(4.0),
-                          child: SizedBox(
-                            height: 16,
-                            child: LogoImage(),
+    return ColoredBox(
+      color: (theme.appBarTheme.backgroundColor ?? theme.colorScheme.surface)
+          .withOpacity(0.6),
+      child: WindowTitleBarBox(
+        child: Row(
+          children: [
+            Expanded(
+              child: MoveWindow(
+                child: showTitle
+                    ? Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.all(4.0),
+                            child: SizedBox(
+                              height: 16,
+                              child: LogoImage(),
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 1),
-                        if (leading != null) leading!,
-                      ],
-                    )
-                  : null,
+                          const SizedBox(width: 1),
+                          if (leading != null) leading!,
+                          if (header != null) Text(header!),
+                        ],
+                      )
+                    : null,
+              ),
             ),
-          ),
-          ...titleBarIcons,
-          MinimizeWindowButton(),
-          MaximizeWindowButton(),
-          CloseWindowButton(
-            onPressed: () async {
-              AppLogger.instance.flush();
-              appWindow.close();
-            },
-          ),
-        ],
+            ...titleBarIcons,
+            MinimizeWindowButton(),
+            MaximizeWindowButton(),
+            CloseWindowButton(
+              onPressed: () async {
+                AppLogger.instance.flush();
+                appWindow.close();
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -90,38 +100,53 @@ class _CupertinoWindowTitlebar extends StatelessWidget {
     required this.showTitle,
     required this.titleBarIcons,
     required this.leading,
+    required this.header,
   });
 
   final bool showTitle;
   final List<Widget> titleBarIcons;
   final Widget? leading;
+  final String? header;
 
   @override
   Widget build(BuildContext context) {
-    return WindowTitleBarBox(
-      child: Row(
-        children: [
-          const SizedBox(width: 65),
-          if (leading != null) leading!,
-          Expanded(
-            child: MoveWindow(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  ...titleBarIcons,
-                  const Padding(
-                    padding: EdgeInsets.all(4.0),
-                    child: SizedBox(
-                      height: 16,
-                      child: LogoImage(),
-                    ),
-                  ),
-                ],
+    return ColoredBox(
+      color: CupertinoTheme.of(context).barBackgroundColor,
+      child: WindowTitleBarBox(
+        child: Row(
+          children: [
+            const SizedBox(width: 65),
+            if (leading != null) leading!,
+            Expanded(
+              child: MoveWindow(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    if (header != null)
+                      Expanded(
+                        child: Center(
+                          child: Text(header!),
+                        ),
+                      ),
+                    Row(
+                      children: [
+                        ...titleBarIcons,
+                        const Padding(
+                          padding: EdgeInsets.all(4.0),
+                          child: SizedBox(
+                            height: 16,
+                            child: LogoImage(),
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

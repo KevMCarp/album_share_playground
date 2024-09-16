@@ -9,6 +9,7 @@ class MobileScaffold extends ConsumerWidget {
   const MobileScaffold({
     required this.showTitleBar,
     this.titleBarIcons = const [],
+    this.header,
     this.showBackButton = false,
     required this.body,
     super.key,
@@ -19,6 +20,8 @@ class MobileScaffold extends ConsumerWidget {
 
   /// title bar icons will only be shown if showTitleBar is set to true.
   final List<Widget> titleBarIcons;
+
+  final String? header;
 
   /// If [showTitleBar] and [showBackButton] are true, the back button
   /// will be shown on the title bar.
@@ -58,16 +61,22 @@ class MobileScaffold extends ConsumerWidget {
                   leading: showBackButton ? const TitlebarBackButton() : null,
                   automaticallyImplyLeading: false,
                   actions: titleBarIcons,
-                  title: const Row(
+                  title: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      SizedBox(height: 25, child: LogoImage()),
-                      SizedBox(width: 5),
-                      LogoText(tagLine: false),
+                      const SizedBox(height: 25, child: LogoImage()),
+                      const SizedBox(width: 5),
+                      const LogoText(tagLine: false),
+                      if (header != null)
+                        Text(
+                          ' - $header',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
                     ],
                   ),
                 ),
               ),
+            ),
             ),
         ],
       ),
