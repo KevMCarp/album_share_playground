@@ -3,8 +3,8 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../models/asset.dart';
-import '../../../services/library/video/cache/video_cache.dart';
-import '../../../services/library/video/cache/video_cache_manager.dart';
+import '../../../services/video/cache/video_cache.dart';
+import '../../../services/video/cache/video_cache_manager.dart';
 import 'video_viewer.dart';
 
 class AssetVideoViewer extends ConsumerStatefulWidget {

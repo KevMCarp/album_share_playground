@@ -13,10 +13,10 @@ import '../../immich/extensions/build_context_extensions.dart';
 import '../../immich/photo_view/photo_view.dart';
 import '../../immich/photo_view/photo_view_gallery.dart';
 import '../../immich/providers/haptic_feedback.provider.dart';
-import '../../models/asset.dart';
 import '../../routes/app_router.dart';
 import '../../services/preferences/preferences_providers.dart';
 import '../../services/providers/app_bar_listener.dart';
+import '../../services/video/cache/video_cache.dart';
 import 'asset_viewer_screen_state.dart';
 import 'video_viewer/asset_video_viewer.dart';
 
@@ -34,9 +34,11 @@ class AssetViewerWidget extends ConsumerStatefulWidget {
 
 class _AssetViewerWidgetState extends ConsumerState<AssetViewerWidget> {
   late final PageController _controller;
-  late Asset _currentAsset;
 
+  // Used to determine scroll direction.
+  int _previousIndex = 0;
   int _currentIndex = 0;
+
   bool _isZoomed = false;
   bool _isPlayingVideo = false;
   Offset? _localPosition;
@@ -62,13 +64,11 @@ class _AssetViewerWidgetState extends ConsumerState<AssetViewerWidget> {
 
   void _setIfMounted(VoidCallback callback) {
     if (mounted) {
-      setState(() {
-        callback();
-      });
+      setState(callback);
     }
   }
 
-  Future<void> precacheNextImage(int index, RenderList renderList) async {
+  Future<void> precacheNextAsset(int index, RenderList renderList) async {
     void onError(Object exception, StackTrace? stackTrace) {
       // swallow error silently
       debugPrint('Error precaching next image: $exception, $stackTrace');
@@ -77,18 +77,23 @@ class _AssetViewerWidgetState extends ConsumerState<AssetViewerWidget> {
     try {
       if (index < renderList.totalAssets && index >= 0) {
         final asset = renderList.loadAsset(index);
-        await precacheImage(
-          ImmichImage.imageProvider(
-            asset: asset,
-            preferences: ref.watch(PreferencesProviders.service),
-          ),
-          context,
-          onError: onError,
-        );
+
+        if (asset.isVideo) {
+          await precacheVideo(asset);
+        } else {
+          await precacheImage(
+            ImmichImage.imageProvider(
+              asset: asset,
+              preferences: ref.watch(PreferencesProviders.service),
+            ),
+            context,
+            onError: onError,
+          );
+        }
       }
     } catch (e) {
       // swallow error silently
-      debugPrint('Error precaching next image: $e');
+      debugPrint('Error precaching next asset: $e');
       if (mounted) {
         AppRouter.back(context);
       }
@@ -117,25 +122,20 @@ class _AssetViewerWidgetState extends ConsumerState<AssetViewerWidget> {
     }
 
     final ratio = d.dy / max(d.dx.abs(), 1);
+
+    // Swipe down
     if (d.dy > sensitivity && ratio > ratioThreshold) {
       ref.read(appBarListenerProvider.notifier).show();
       AppRouter.back(context);
     }
-    // else if (d.dy < -sensitivity && ratio < -ratioThreshold) {
-    //   showInfo();
-    // }
+    // swipe up
+    else if (d.dy < -sensitivity && ratio < -ratioThreshold) {
+      //   showInfo();
+    }
 
     _setIfMounted(() {
       _isPlayingVideo = false;
     });
-
-    unawaited(
-      // Delay this a bit so we can finish loading the page
-      Future.delayed(const Duration(milliseconds: 400)).then(
-        // Precache the next image
-        (_) => precacheNextImage(_currentIndex + 1, renderList),
-      ),
-    );
   }
 
   // void showInfo() {
@@ -171,7 +171,6 @@ class _AssetViewerWidgetState extends ConsumerState<AssetViewerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    _currentAsset = renderList.loadAsset(_currentIndex);
     final shouldLoopVideo = ref.watch(PreferencesProviders.shouldLoopVideo);
     //TODO: waiting on framework update for PopScope to work as expected.
     // https://github.com/flutter/flutter/issues/138737
@@ -196,29 +195,33 @@ class _AssetViewerWidgetState extends ConsumerState<AssetViewerWidget> {
                 : const ClampingScrollPhysics() // Use heavy physics for Android
             ),
         scaleStateChangedCallback: _updateScaleState,
-        onPageChanged: (value) async {
-          final next = _currentIndex < value ? value + 1 : value - 1;
+        onPageChanged: (index) async {
+          _previousIndex = _currentIndex;
+          _currentIndex = index;
+          final next = _previousIndex < index ? index + 1 : index - 1;
 
           ref.read(hapticFeedbackProvider.notifier).selectionClick();
 
-          _currentIndex = value;
-          _isPlayingVideo = false;
+          _setIfMounted(() {
+            _isPlayingVideo = false;
+          });
 
           // Wait for page change animation to finish
           await Future.delayed(const Duration(milliseconds: 400));
           // Then precache the next image
-          unawaited(precacheNextImage(next, renderList));
+          unawaited(precacheNextAsset(next, renderList));
         },
         builder: (context, index) {
-          final a = index == _currentIndex
-              ? _currentAsset
-              : renderList.loadAsset(index);
+          final asset = renderList.loadAsset(index);
+          final heroTag = index == _currentIndex
+              ? '${asset.id}_${widget.viewerState.heroOffset}'
+              : '${asset.id}_out_of_view';
           final ImageProvider provider = ImmichImage.imageProvider(
-            asset: a,
+            asset: asset,
             preferences: ref.watch(PreferencesProviders.service),
           );
 
-          if (a.isImage && !_isPlayingVideo) {
+          if (asset.isImage && !_isPlayingVideo) {
             return PhotoViewGalleryPageOptions(
               onDragStart: (_, details, __) =>
                   _localPosition = details.localPosition,
@@ -228,7 +231,7 @@ class _AssetViewerWidgetState extends ConsumerState<AssetViewerWidget> {
                 ref.read(appBarListenerProvider.notifier).toggle();
               },
               onLongPressStart: (_, __, ___) {
-                if (_currentAsset.livePhotoVideoId != null) {
+                if (asset.livePhotoVideoId != null) {
                   _setIfMounted(() {
                     _isPlayingVideo = true;
                   });
@@ -236,14 +239,14 @@ class _AssetViewerWidgetState extends ConsumerState<AssetViewerWidget> {
               },
               imageProvider: provider,
               heroAttributes: PhotoViewHeroAttributes(
-                tag: '${_currentAsset.id}_${widget.viewerState.heroOffset}',
+                tag: heroTag,
                 transitionOnUserGestures: true,
               ),
               filterQuality: FilterQuality.high,
               tightMode: true,
               minScale: PhotoViewComputedScale.contained,
               errorBuilder: (context, error, stackTrace) => ImmichImage(
-                a,
+                asset,
                 fit: BoxFit.contain,
               ),
             );
@@ -258,15 +261,15 @@ class _AssetViewerWidgetState extends ConsumerState<AssetViewerWidget> {
                 handleSwipeUpDown(details, renderList);
               },
               heroAttributes: PhotoViewHeroAttributes(
-                tag: '${_currentAsset.id}_${widget.viewerState.heroOffset}',
+                tag: heroTag,
               ),
               filterQuality: FilterQuality.high,
               maxScale: 1.0,
               minScale: 1.0,
               basePosition: Alignment.center,
               child: AssetVideoViewer(
-                key: ValueKey(a),
-                asset: a,
+                key: ValueKey(asset),
+                asset: asset,
                 loopVideo: shouldLoopVideo,
                 placeholder: Image(
                   image: provider,
@@ -291,7 +294,7 @@ class _AssetViewerWidgetState extends ConsumerState<AssetViewerWidget> {
                   ),
                 ),
                 ImmichThumbnail(
-                  asset: _currentAsset,
+                  asset: renderList.loadAsset(index),
                   fit: BoxFit.contain,
                 ),
               ],

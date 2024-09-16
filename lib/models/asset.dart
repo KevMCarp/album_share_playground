@@ -83,6 +83,9 @@ class Asset {
   bool get isImage => type == AssetType.image;
 
   @ignore
+  bool get isVideo => type == AssetType.video;
+
+  @ignore
   Duration get duration => durationString?.toDuration() ?? Duration.zero;
 
   @ignore
