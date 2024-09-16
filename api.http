@@ -1,0 +1,67 @@
+@baseUrl = https://photos.concentechltd.co.uk/api
+@accessToken = ix4xzHkCg0yg4HfwlTGvMKdEAmKSGocjN8TlQ1Lrc
+@userId = 67914a2e-f084-4062-abf0-a8e9859d9dcb
+@videoId = c6845999-dee8-479b-ad4e-1dcada940648
+
+### Ping the server
+GET {{baseUrl}}/server-info/ping
+Accept: application/json
+
+### Check server info
+GET {{baseUrl}}/server-info/features
+Accept: application/json
+
+### Login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+    "email" : "test@email.com",
+    "password": "e4cG2iZ+OJQ#CDqJ"
+}
+
+### Check auth token
+POST {{baseUrl}}/auth/validateToken
+Accept: application/json
+
+### Logout
+POST {{baseUrl}}/auth/logout
+Accept: application/json
+
+### Change password
+POST {{baseUrl}}/auth/change-password
+Content-Type: application/json
+Accept: application/json
+
+{
+    "newPassword": "demo123456",
+    "password": "demo"
+}
+
+### All shared albums
+GET {{baseUrl}}/albums?shared=true
+Accept: application/json
+
+### All personal albums
+GET {{baseUrl}}/albums?shared=false
+Accept: application/json
+
+### Get album info without assets, use hash to check content
+GET {{baseUrl}}/albums/dfab5afd-cec1-4224-8da2-fef934b3205f
+?withoutAssets=true
+Accept: application/json
+
+### Get album info with assets
+GET {{baseUrl}}/albums/b3a6be83-0960-46b5-bac4-a1fb611f7146
+?withoutAssets=false
+Accept: application/json
+
+### Get current user
+GET {{baseUrl}}/users/me
+Accept: application/json
+
+### Get video playback
+GET {{baseUrl}}/assets/{{videoId}}/video/playback
+Accept: application/octet-stream
+
