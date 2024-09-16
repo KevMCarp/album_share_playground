@@ -289,6 +289,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0"
+  cupertino_icons:
+    dependency: "direct main"
+    description:
+      name: cupertino_icons
+      sha256: ba631d1c7f7bef6b729a622b7b752645a2d076dba9976925b8f25725a30e1ee6
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.8"
   custom_lint:
     dependency: transitive
     description:
@@ -489,10 +497,10 @@ packages:
     dependency: "direct main"
     description:
       name: go_router
-      sha256: "604910f5e8d53e6ca8eb6700f7deb383b4bcc3e487223c9962f355144fd14f9b"
+      sha256: "2ddb88e9ad56ae15ee144ed10e33886777eb5ca2509a914850a5faa7b52ff459"
       url: "https://pub.dev"
     source: hosted
-    version: "14.2.5"
+    version: "14.2.7"
   google_fonts:
     dependency: "direct main"
     description:
