@@ -15,7 +15,6 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../core/components/app_snackbar.dart';
 import '../../models/asset.dart';
-import '../../routes/app_router.dart';
 import '../extensions/build_context_extensions.dart';
 import '../extensions/collection_extensions.dart';
 import '../providers/haptic_feedback.provider.dart';
@@ -47,6 +46,7 @@ class ImmichAssetGridView extends ConsumerStatefulWidget {
   final bool alwaysVisibleScrollThumb;
   final bool showDragScroll;
   final bool showStack;
+  final void Function(AssetViewerScreenState state) onTap;
 
   const ImmichAssetGridView({
     super.key,
@@ -62,6 +62,7 @@ class ImmichAssetGridView extends ConsumerStatefulWidget {
     this.alwaysVisibleScrollThumb = false,
     this.showDragScroll = true,
     this.showStack = false,
+    required this.onTap,
   });
 
   @override
@@ -118,6 +119,7 @@ class ImmichAssetGridViewState extends ConsumerState<ImmichAssetGridView> {
       dynamicLayout: widget.dynamicLayout,
       showStack: widget.showStack,
       heroOffset: widget.heroOffset,
+      onTap: widget.onTap,
     );
   }
 
@@ -397,6 +399,7 @@ class _Section extends StatelessWidget {
   final bool dynamicLayout;
   final bool showStack;
   final int heroOffset;
+  final void Function(AssetViewerScreenState state) onTap;
 
   const _Section({
     required this.section,
@@ -408,6 +411,7 @@ class _Section extends StatelessWidget {
     required this.dynamicLayout,
     required this.showStack,
     required this.heroOffset,
+    required this.onTap,
   });
 
   @override
@@ -464,6 +468,7 @@ class _Section extends StatelessWidget {
                       renderList: renderList,
                       showStack: showStack,
                       heroOffset: heroOffset,
+                      onTap: onTap,
                     ),
           ],
         );
@@ -529,6 +534,7 @@ class _AssetRow extends StatelessWidget {
   final RenderList renderList;
   final int heroOffset;
   final bool showStack;
+  final void Function(AssetViewerScreenState state) onTap;
   const _AssetRow({
     super.key,
     required this.rowStartIndex,
@@ -542,6 +548,7 @@ class _AssetRow extends StatelessWidget {
     required this.renderList,
     required this.heroOffset,
     required this.showStack,
+    required this.onTap,
   });
 
   @override
@@ -585,15 +592,12 @@ class _AssetRow extends StatelessWidget {
           ),
           child: GestureDetector(
             onTap: () {
-              AppRouter.toAssetViewer(
-                context,
-                AssetViewerScreenState(
-                  renderList: renderList,
-                  initialIndex: absoluteOffset + index,
-                  heroOffset: heroOffset,
-                  showStack: showStack,
-                ),
-              );
+              onTap(AssetViewerScreenState(
+                renderList: renderList,
+                heroOffset: heroOffset,
+                initialIndex: absoluteOffset + index,
+                showStack: showStack,
+              ));
             },
             child: AssetIndexWrapper(
               rowIndex: rowStartIndex + index,
