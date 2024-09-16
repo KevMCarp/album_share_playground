@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -251,9 +252,15 @@ class DraggableScrollbarState extends State<DraggableScrollbar>
   }
 
   double get barMaxScrollExtent =>
-      (context.size?.height ?? 0) -
-      widget.heightScrollThumb -
-      (widget.heightOffset ?? 0);
+      _screenHeight - widget.heightScrollThumb - (widget.heightOffset ?? 0);
+
+  double get _screenHeight {
+    try {
+      return context.size?.height ?? 0;
+    } catch (_) {
+      return MediaQuery.sizeOf(context).height;
+    }
+  }
 
   double get barMinScrollExtent => 0;
 
@@ -287,7 +294,7 @@ class DraggableScrollbarState extends State<DraggableScrollbar>
                   onVerticalDragEnd: _onVerticalDragEnd,
                   child: Container(
                     alignment: Alignment.topRight,
-                    margin: EdgeInsets.only(top: _barOffset),
+                    margin: EdgeInsets.only(top: max(1, _barOffset)),
                     padding: widget.padding,
                     child: widget.scrollThumbBuilder(
                       widget.backgroundColor,
