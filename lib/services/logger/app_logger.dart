@@ -27,7 +27,7 @@ class AppLogger {
 
   void _writeLog(LogRecord record) {
     if (kDebugMode) {
-      print(record.toString());
+      print('$record  ${record.error ?? ''}');
     }
     _logBuffer.add(Log.fromRecord(record));
     _timer?.cancel();
