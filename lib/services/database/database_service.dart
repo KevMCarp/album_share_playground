@@ -10,6 +10,9 @@ import '../../models/log.dart';
 import '../../models/preferences.dart';
 import '../../models/user.dart';
 
+//TODO: Consider drift https://pub.dev/packages/drift.
+// Isar is not currently being updated.
+
 class DatabaseService {
   static final DatabaseService _instance = DatabaseService._();
   DatabaseService._();
@@ -217,6 +220,16 @@ class DatabaseService {
               .sortByCreatedAtDesc()
               .watch(fireImmediately: true),
       'assetStream',
+    );
+  }
+
+  Stream<List<Album>> albumsStream() {
+    return _readTxnSync(
+      () => _db.albums //
+          .where()
+          .anyIsarId()
+          .watch(fireImmediately: true),
+      'albumsStream',
     );
   }
 
