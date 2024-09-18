@@ -86,7 +86,7 @@ class AppRouter {
 
   static void back(BuildContext context) {
     try {
-      GoRouter.of(context).pop();
+      Navigator.of(context).maybePop();
     } on GoError {
       // GoRouter throws on macOS when calling pop.
     }
