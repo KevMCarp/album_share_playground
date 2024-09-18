@@ -9,14 +9,14 @@ part 'preferences.g.dart';
 class Preferences {
   const Preferences({
     this.theme = ThemeMode.system,
-    this.groupBy = GroupAssetsBy.day,
+    this.groupBy = GroupAssetsBy.auto,
     this.enableHapticFeedback = true,
-    this.syncFrequency = 1800,
+    this.syncFrequency = 300,
     this.loadPreview = true,
     this.loadOriginal = false,
     this.maxExtent = 90,
-    this.dynamicLayout = false,
-    this.loopVideos = true,
+    this.dynamicLayout = true,
+    this.loopVideos = false,
   });
 
   static const id = 0;
