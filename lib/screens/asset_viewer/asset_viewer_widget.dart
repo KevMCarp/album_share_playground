@@ -129,6 +129,8 @@ class _AssetViewerWidgetState extends ConsumerState<AssetViewerWidget> {
     if (d.dy > sensitivity && ratio > ratioThreshold) {
       ref.read(appBarListenerProvider.notifier).show();
       AppRouter.back(context);
+      // Stops AppRouter.back being called twice.
+      _localPosition = null;
     }
     // swipe up
     else if (d.dy < -sensitivity && ratio < -ratioThreshold) {
