@@ -92,7 +92,8 @@ class AppRouter {
     }
   }
 
-  static void toLibrary(BuildContext context) => to(_kLibraryRoute, context);
+  static void toLibrary(BuildContext context) =>
+      GoRouter.of(context).go(_kLibraryRoute);
   static void toPreferences(BuildContext context) =>
       to(_kPreferencesRoute, context);
   static void toLogin(BuildContext context) => to(_kLoginRoute, context);
