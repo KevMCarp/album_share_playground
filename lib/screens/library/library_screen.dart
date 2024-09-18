@@ -185,7 +185,9 @@ class _AlbumsScreen extends ConsumerWidget {
             mainAxisSpacing: 4,
           ),
           padding: EdgeInsets.symmetric(
-              vertical: AppScaffold.appBarHeight(context), horizontal: 4),
+            vertical: AppScaffold.appBarHeight(context),
+            horizontal: 4,
+          ),
         );
       },
       error: (e, _) {
