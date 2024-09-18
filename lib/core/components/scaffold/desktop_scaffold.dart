@@ -51,7 +51,7 @@ class DesktopScaffold extends ConsumerWidget {
             top: appBarVisible ? 0 : -_appBarHeight,
             child: MouseRegion(
               hitTestBehavior: HitTestBehavior.translucent,
-              opaque: false,
+              opaque: true,
               child: SizedBox(
                 height: _appBarHeight,
                 child: DesktopWindowTitlebar(
