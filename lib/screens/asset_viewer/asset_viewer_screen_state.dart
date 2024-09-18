@@ -1,4 +1,5 @@
 import '../../immich/asset_grid/asset_grid_data_structure.dart';
+import '../../models/album.dart';
 
 class AssetViewerScreenState {
   const AssetViewerScreenState({
@@ -6,12 +7,14 @@ class AssetViewerScreenState {
     this.initialIndex = 0,
     this.heroOffset = 0,
     this.showStack = false,
+    this.album,
   });
 
   final RenderList renderList;
   final int initialIndex;
   final int heroOffset;
   final bool showStack;
+  final Album? album;
 
   factory AssetViewerScreenState.fromExtra(Object extra) {
     assert(extra is Map<String, dynamic>);
@@ -30,4 +33,14 @@ class AssetViewerScreenState {
         'heroOffset': heroOffset,
         'showStack': showStack,
       };
+
+  AssetViewerScreenState withAlbum(Album album) {
+    return AssetViewerScreenState(
+      renderList: renderList,
+      initialIndex: initialIndex,
+      heroOffset: heroOffset,
+      showStack: showStack,
+      album: album,
+    );
+  }
 }
