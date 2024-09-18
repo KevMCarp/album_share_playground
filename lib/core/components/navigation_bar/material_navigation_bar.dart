@@ -19,9 +19,13 @@ class MaterialBottomNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return MediaQuery(
       data: MediaQuery.of(context).removePadding(removeTop: true),
       child: NavigationBar(
+        backgroundColor:
+            (theme.appBarTheme.backgroundColor ?? theme.colorScheme.surface)
+                .withOpacity(0.6),
         selectedIndex: index,
         onDestinationSelected: onDestinationSelected,
         destinations: items.mapList(
@@ -50,7 +54,11 @@ class MaterialSideNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return NavigationRail(
+      backgroundColor:
+          (theme.appBarTheme.backgroundColor ?? theme.colorScheme.surface)
+              .withOpacity(0.6),
       selectedIndex: index,
       onDestinationSelected: onDestinationSelected,
       destinations: items.mapList(
