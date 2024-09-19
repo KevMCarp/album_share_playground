@@ -112,16 +112,16 @@ Preferences _preferencesDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Preferences(
-    dynamicLayout: reader.readBoolOrNull(offsets[0]) ?? false,
+    dynamicLayout: reader.readBoolOrNull(offsets[0]) ?? true,
     enableHapticFeedback: reader.readBoolOrNull(offsets[1]) ?? true,
     groupBy:
         _PreferencesgroupByValueEnumMap[reader.readByteOrNull(offsets[2])] ??
-            GroupAssetsBy.day,
+            GroupAssetsBy.auto,
     loadOriginal: reader.readBoolOrNull(offsets[3]) ?? false,
     loadPreview: reader.readBoolOrNull(offsets[4]) ?? true,
-    loopVideos: reader.readBoolOrNull(offsets[5]) ?? true,
+    loopVideos: reader.readBoolOrNull(offsets[5]) ?? false,
     maxExtent: reader.readLongOrNull(offsets[6]) ?? 90,
-    syncFrequency: reader.readLongOrNull(offsets[7]) ?? 1800,
+    syncFrequency: reader.readLongOrNull(offsets[7]) ?? 300,
     theme: _PreferencesthemeValueEnumMap[reader.readByteOrNull(offsets[8])] ??
         ThemeMode.system,
   );
@@ -136,22 +136,22 @@ P _preferencesDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readBoolOrNull(offset) ?? false) as P;
+      return (reader.readBoolOrNull(offset) ?? true) as P;
     case 1:
       return (reader.readBoolOrNull(offset) ?? true) as P;
     case 2:
       return (_PreferencesgroupByValueEnumMap[reader.readByteOrNull(offset)] ??
-          GroupAssetsBy.day) as P;
+          GroupAssetsBy.auto) as P;
     case 3:
       return (reader.readBoolOrNull(offset) ?? false) as P;
     case 4:
       return (reader.readBoolOrNull(offset) ?? true) as P;
     case 5:
-      return (reader.readBoolOrNull(offset) ?? true) as P;
+      return (reader.readBoolOrNull(offset) ?? false) as P;
     case 6:
       return (reader.readLongOrNull(offset) ?? 90) as P;
     case 7:
-      return (reader.readLongOrNull(offset) ?? 1800) as P;
+      return (reader.readLongOrNull(offset) ?? 300) as P;
     case 8:
       return (_PreferencesthemeValueEnumMap[reader.readByteOrNull(offset)] ??
           ThemeMode.system) as P;

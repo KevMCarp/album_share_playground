@@ -1,0 +1,54 @@
+name: Verify version & release notes have been updated
+
+on:
+  push:
+
+jobs:
+  verify-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "Ensure pubspec and release notes have been updated"
+        uses: danieljimeneznz/ensure-files-changed@v4.1.1
+        with:
+          require-changes-to: |
+            pubspec.yaml
+            CHANGELOG.md
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: List files
+        id: list-files
+        run: ls -lah
+
+      - name: Parse pubspec.yaml
+        id: yaml-version
+        uses: pietrobolcato/action-read-yaml@1.0.0
+        with:
+          config: pubspec.yaml
+
+      - name: Print pubspec.yaml version
+        run: |
+          echo "${{ steps.yaml-version.outputs['version'] }}"
+
+      - name: Fetch previous tag
+        id: tag-version
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+
+      - name: Display tag version
+        run: |
+          echo "${{ steps.tag-version.outputs.tag }}"
+
+      - name: "Setup Dart environment"
+        uses: dart-lang/setup-dart@v1
+
+      - name: Install Dart dependencies
+        run: |
+          cd version_check
+          dart pub get
+
+      - name: Compare versions
+        run: dart run version_check/bin/version_check.dart -p "${{  steps.tag-version.outputs.tag  }}" -n "${{  steps.yaml-version.outputs.data  }}"
