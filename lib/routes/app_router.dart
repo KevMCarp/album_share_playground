@@ -86,13 +86,14 @@ class AppRouter {
 
   static void back(BuildContext context) {
     try {
-      GoRouter.of(context).pop();
+      Navigator.of(context).maybePop();
     } on GoError {
       // GoRouter throws on macOS when calling pop.
     }
   }
 
-  static void toLibrary(BuildContext context) => to(_kLibraryRoute, context);
+  static void toLibrary(BuildContext context) =>
+      GoRouter.of(context).go(_kLibraryRoute);
   static void toPreferences(BuildContext context) =>
       to(_kPreferencesRoute, context);
   static void toLogin(BuildContext context) => to(_kLoginRoute, context);

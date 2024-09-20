@@ -34,6 +34,7 @@ class AssetViewerWidget extends ConsumerStatefulWidget {
 
 class _AssetViewerWidgetState extends ConsumerState<AssetViewerWidget> {
   late final PageController _controller;
+  late final PhotoViewScaleStateController _scaleController;
 
   // Used to determine scroll direction.
   int _previousIndex = 0;
@@ -48,6 +49,7 @@ class _AssetViewerWidgetState extends ConsumerState<AssetViewerWidget> {
     super.initState();
     _currentIndex = widget.viewerState.initialIndex;
     _controller = PageController(initialPage: _currentIndex);
+    _scaleController = PhotoViewScaleStateController();
   }
 
   @override
@@ -127,6 +129,8 @@ class _AssetViewerWidgetState extends ConsumerState<AssetViewerWidget> {
     if (d.dy > sensitivity && ratio > ratioThreshold) {
       ref.read(appBarListenerProvider.notifier).show();
       AppRouter.back(context);
+      // Stops AppRouter.back being called twice.
+      _localPosition = null;
     }
     // swipe up
     else if (d.dy < -sensitivity && ratio < -ratioThreshold) {
@@ -172,13 +176,11 @@ class _AssetViewerWidgetState extends ConsumerState<AssetViewerWidget> {
   @override
   Widget build(BuildContext context) {
     final shouldLoopVideo = ref.watch(PreferencesProviders.shouldLoopVideo);
-    //TODO: waiting on framework update for PopScope to work as expected.
-    // https://github.com/flutter/flutter/issues/138737
     return PopScope(
       canPop: !_isZoomed,
       onPopInvokedWithResult: (pop, _) {
-        print('Pop request. can pop: $pop is zoomed: $_isZoomed');
-        if (!pop) {
+        if (_isZoomed) {
+          _scaleController.reset();
           _setIfMounted(() {
             _isZoomed = false;
           });
@@ -237,6 +239,7 @@ class _AssetViewerWidgetState extends ConsumerState<AssetViewerWidget> {
                   });
                 }
               },
+              scaleStateController: _scaleController,
               imageProvider: provider,
               heroAttributes: PhotoViewHeroAttributes(
                 tag: heroTag,
@@ -260,6 +263,7 @@ class _AssetViewerWidgetState extends ConsumerState<AssetViewerWidget> {
               onDragUpdate: (_, details, __) {
                 handleSwipeUpDown(details, renderList);
               },
+              scaleStateController: _scaleController,
               heroAttributes: PhotoViewHeroAttributes(
                 tag: heroTag,
               ),

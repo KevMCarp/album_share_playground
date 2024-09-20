@@ -21,7 +21,6 @@ class AssetViewerScreen extends ConsumerStatefulWidget {
 }
 
 class _AssetViewerScreenState extends ConsumerState<AssetViewerScreen> {
-
   @override
   void initState() {
     super.initState();
@@ -29,7 +28,7 @@ class _AssetViewerScreenState extends ConsumerState<AssetViewerScreen> {
   }
 
   void _hideAppBar() {
-    ref.read(appBarListenerProvider.notifier).hideIn(1.seconds, true);
+    ref.read(appBarListenerProvider.notifier).hideIn(500.milliseconds, true);
   }
 
   @override
@@ -37,6 +36,7 @@ class _AssetViewerScreenState extends ConsumerState<AssetViewerScreen> {
     return AppScaffold(
       showTitleBar: true,
       showBackButton: true,
+      header: widget.viewerState.album?.name,
       body: AssetViewerWidget(viewerState: widget.viewerState),
     );
   }

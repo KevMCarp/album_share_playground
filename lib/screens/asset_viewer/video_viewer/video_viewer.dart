@@ -35,9 +35,9 @@ class VideoViewer extends ConsumerWidget {
           }
           final notifier = ref.read(appBarListenerProvider.notifier);
           if (show) {
-            notifier.show(true);
+            notifier.show();
           } else {
-            notifier.hide(true);
+            notifier.hide();
           }
         },
       ),

@@ -81,7 +81,8 @@ class _AlbumsScreen extends ConsumerWidget {
                         mobile: () => _refresh(ref),
                       ),
                       onTap: (state) {
-                        AppRouter.toAssetViewer(context, state);
+                        AppRouter.toAssetViewer(
+                            context, state.withAlbum(album));
                       },
                     ),
                   ),
