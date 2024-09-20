@@ -1,3 +1,8 @@
+// ignore_for_file: avoid_print
+// Logging framework likely not initialised at this point.
+
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:logging/logging.dart';
@@ -26,8 +31,14 @@ class _AppLifecycleScopeState extends State<AppLifecycleScope>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.detached) {
-      AppLogger.instance.flush();
+      _onClose();
     }
+  }
+
+  @override
+  Future<AppExitResponse> didRequestAppExit() {
+    _onClose();
+    return super.didRequestAppExit();
   }
 
   @override
@@ -46,9 +57,16 @@ class _AppLifecycleScopeState extends State<AppLifecycleScope>
   void initWindow() {
     final locale = AppLocalizations.of(context)!;
     AppLocale.instance.set(locale);
-    AppWindow.setWindow(locale.appTitle)
-        .then((_) => logger.info('App window set'))
-        .onError((e, s) => logger.severe('Failed to set window', e, s));
+    AppWindow.setWindow(locale.appTitle).then((_) {
+      logger.info('App window set');
+    }).onError((e, s) {
+      print('Failed to set window: \n$e, \n$s');
+      logger.severe('Failed to set window', e, s);
+    });
+  }
+
+  void _onClose() {
+    AppLogger.instance.flush();
   }
 
   @override

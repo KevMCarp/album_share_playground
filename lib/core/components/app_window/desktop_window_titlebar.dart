@@ -2,7 +2,6 @@ import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../../../services/logger/app_logger.dart';
 import '../logo_widget.dart';
 import 'app_window.dart';
 
@@ -82,12 +81,7 @@ class DesktopWindowTitlebar extends StatelessWidget {
             ...titleBarIcons,
             MinimizeWindowButton(),
             MaximizeWindowButton(),
-            CloseWindowButton(
-              onPressed: () async {
-                AppLogger.instance.flush();
-                appWindow.close();
-              },
-            ),
+            CloseWindowButton(),
           ],
         ),
       ),
