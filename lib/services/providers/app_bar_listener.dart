@@ -15,10 +15,10 @@ class AppBarListener extends StateNotifier<bool> {
 
   Timer? _timer;
 
-  void show([bool statusBar = false]) {
+  void show() {
     _timer?.cancel();
     state = true;
-    _maybeToggleStatusBar(true, statusBar);
+    _maybeToggleStatusBar(true, true);
   }
 
   void hide([bool statusBar = false]) {
