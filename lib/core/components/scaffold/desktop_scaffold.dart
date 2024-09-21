@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../services/providers/app_bar_listener.dart';
-import '../titlebar_buttons/titlebar_back_button.dart';
 import '../app_window/desktop_window_titlebar.dart';
+import '../titlebar_buttons/titlebar_back_button.dart';
 
 const _appBarHeight = 36.0;
 

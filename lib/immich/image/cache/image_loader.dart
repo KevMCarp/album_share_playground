@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'dart:ui' as ui;
 
-import 'package:album_share/services/database/database_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+
+import '../../../services/database/database_service.dart';
 
 /// Loads the codec from the URI and sends the events to the [chunkEvents] stream
 ///
@@ -16,7 +17,9 @@ class ImageLoader {
     required ImageDecoderCallback decode,
     StreamController<ImageChunkEvent>? chunkEvents,
   }) async {
-    final headers = {'x-immich-user-token' : DatabaseService.instance.getAuthTokenSync()};
+    final headers = {
+      'x-immich-user-token': DatabaseService.instance.getAuthTokenSync()
+    };
 
     final stream = cache.getFileStream(
       uri,
@@ -46,11 +49,8 @@ class ImageLoader {
   }
 }
 
-
 class ImageLoadingException implements Exception {
   final String message;
 
   ImageLoadingException(this.message);
-
-
 }

@@ -1,4 +1,4 @@
-import 'package:album_share/immich/photo_view/photo_view.dart';
+import '../../photo_view.dart';
 import 'package:flutter/widgets.dart';
 
 import '../core/photo_view_core.dart';

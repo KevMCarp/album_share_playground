@@ -1,7 +1,7 @@
-import 'package:album_share/core/utils/app_localisations.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/components/platform_list_tile.dart';
+import '../../../core/utils/app_localisations.dart';
 
 class OriginalImageWidget extends StatelessWidget {
   const OriginalImageWidget({

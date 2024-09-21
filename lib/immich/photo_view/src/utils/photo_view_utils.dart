@@ -1,8 +1,7 @@
 import 'dart:math' as math;
 import 'dart:ui' show Size;
 
-import 'package:album_share/immich/photo_view/photo_view.dart';
-
+import '../../photo_view.dart';
 
 /// Given a [PhotoViewScaleState], returns a scale value considering [scaleBoundaries].
 double getScaleForScaleState(

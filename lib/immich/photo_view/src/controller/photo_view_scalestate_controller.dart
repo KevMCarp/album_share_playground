@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:album_share/immich/photo_view/photo_view.dart';
+import '../../photo_view.dart';
 import 'package:flutter/widgets.dart' show VoidCallback;
 
 import '../utils/ignorable_change_notifier.dart';

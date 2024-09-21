@@ -1,11 +1,11 @@
 import 'dart:typed_data';
 
-import 'package:album_share/immich/asset_grid/blur_hash.dart';
 import 'package:flutter/material.dart';
 import 'package:octo_image/octo_image.dart';
 
 import '../../models/asset.dart';
 import '../image/immich_remote_thumbnail_provider.dart';
+import 'blur_hash.dart';
 import 'thumbhash_placeholder.dart';
 
 class ImmichThumbnail extends StatelessWidget {
@@ -42,11 +42,10 @@ class ImmichThumbnail extends StatelessWidget {
     }
 
     return ImmichRemoteThumbnailProvider(
-        assetId: asset.id,
-        height: thumbnailSize,
-        width: thumbnailSize,
-        
-      );
+      assetId: asset.id,
+      height: thumbnailSize,
+      width: thumbnailSize,
+    );
   }
 
   @override
@@ -74,7 +73,6 @@ class ImmichThumbnail extends StatelessWidget {
       width: width,
       height: height,
       fit: fit,
-      
     );
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../core/components/scaffold/app_scaffold.dart';
 import '../../core/components/logo_widget.dart';
+import '../../core/components/scaffold/app_scaffold.dart';
 import '../../routes/app_router.dart';
 import 'endpoint_widget.dart';
 import 'login_widget.dart';

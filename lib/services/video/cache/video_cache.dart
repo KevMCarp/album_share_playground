@@ -1,4 +1,4 @@
-import 'package:album_share/services/video/cache/video_cache_manager.dart';
+import 'video_cache_manager.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 import '../../../models/asset.dart';
