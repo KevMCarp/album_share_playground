@@ -2,6 +2,8 @@ name: Verify version & release notes have been updated
 
 on:
   push:
+    paths:
+      - "/nonexistant"
 
 jobs:
   verify-version:
