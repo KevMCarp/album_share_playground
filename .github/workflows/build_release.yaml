@@ -25,11 +25,12 @@ jobs:
         with:
           channel: "stable"
 
-      - name: Add signing config
-        env:
-          ANDROID_KEY: ${{ secrets.ANDROID_KEY_BASE64 }},
-        run: |
-          echo $ANDROID_KEY | base64 -d > android/key.jks
+      - name: Create signing key
+        uses: timheuer/base64-to-file@v1.2
+        with:
+          fileDir: "android/"
+          fileName: "keystore.jks"
+          encodedString: ${{ secrets.ANDROID_KEY_BASE64 }}
 
       - name: Create key.properties
         run: |

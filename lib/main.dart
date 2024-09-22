@@ -10,7 +10,6 @@ import 'core/main/main_app.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   VideoPlayer.ensureInitialized();
-
   runApp(
     const ProviderScope(
       child: LocaleScope(
