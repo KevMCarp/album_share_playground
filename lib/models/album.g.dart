@@ -64,7 +64,7 @@ const AlbumSchema = CollectionSchema(
   getId: _albumGetId,
   getLinks: _albumGetLinks,
   attach: _albumAttach,
-  version: '3.1.0+1',
+  version: '3.1.8',
 );
 
 int _albumEstimateSize(

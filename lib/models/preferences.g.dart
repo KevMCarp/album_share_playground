@@ -76,7 +76,7 @@ const PreferencesSchema = CollectionSchema(
   getId: _preferencesGetId,
   getLinks: _preferencesGetLinks,
   attach: _preferencesAttach,
-  version: '3.1.0+1',
+  version: '3.1.8',
 );
 
 int _preferencesEstimateSize(
