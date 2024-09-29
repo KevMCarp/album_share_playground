@@ -2,19 +2,25 @@ import 'package:flutter/material.dart';
 
 import '../../../screens/auth/auth_listener.dart';
 import '../../utils/platform_utils.dart';
+import '../sidebar/app_sidebar.dart';
 import 'desktop_scaffold.dart';
 import 'mobile_scaffold.dart';
 
 class AppScaffold extends StatelessWidget {
   const AppScaffold({
+    required this.id,
     required this.showTitleBar,
     this.titleBarIcons = const [],
     this.header,
     this.showBackButton = false,
     required this.body,
     this.bottomNavigationBar,
+    this.sidebar,
     super.key,
   });
+
+  /// A unique id for each page.
+  final String id;
 
   /// Display the title, logo and menu icon.
   final bool showTitleBar;
@@ -33,27 +39,33 @@ class AppScaffold extends StatelessWidget {
 
   final Widget? bottomNavigationBar;
 
+  final AppSidebar? sidebar;
+
   @override
   Widget build(BuildContext context) {
     return forPlatform(
       desktop: () {
         return DesktopScaffold(
+          id: id,
           showTitleBar: showTitleBar,
           titleBarIcons: titleBarIcons,
           showBackButton: showBackButton,
           body: AuthListener(child: body),
           bottomNavigationBar: bottomNavigationBar,
           header: header,
+          endDrawer: sidebar,
         );
       },
       mobile: () {
         return MobileScaffold(
+          id: id,
           showTitleBar: showTitleBar,
           titleBarIcons: titleBarIcons,
           showBackButton: showBackButton,
           body: AuthListener(child: body),
           bottomNavigationBar: bottomNavigationBar,
           header: header,
+          endDrawer: sidebar,
         );
       },
     );

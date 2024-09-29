@@ -5,26 +5,36 @@ import 'package:octo_image/octo_image.dart';
 
 import '../../core/components/scaffold/app_navigation_scaffold.dart';
 import '../../core/components/scaffold/app_scaffold.dart';
+import '../../core/components/sidebar/notifications_sidebar.dart';
+import '../../core/components/titlebar_buttons/notification_button.dart';
 import '../../core/components/titlebar_buttons/preferences_button.dart';
 import '../../core/components/titlebar_buttons/refresh_button.dart';
 import '../../core/utils/app_localisations.dart';
 import '../../core/utils/platform_utils.dart';
-import '../../immich/asset_grid/immich_asset_grid_view.dart';
 import '../../immich/asset_grid/immich_thumbnail.dart';
 import '../../models/album.dart';
 import '../../routes/app_router.dart';
 import '../../services/foreground/foreground_service_provider.dart';
 import '../../services/library/library_providers.dart';
 import '../../services/preferences/preferences_providers.dart';
+import 'library_scroll_view.dart';
 
 class LibraryScreen extends StatelessWidget {
   const LibraryScreen({super.key});
 
+  static const id = 'library_screen';
+
   @override
   Widget build(BuildContext context) {
     return AppNavigationScaffold(
+      id: id,
       showBackButton: false,
-      titleBarIcons: const [MaybeRefreshButton(), PreferencesButton()],
+      sidebar: const NotificationSidebar(),
+      titleBarIcons: const [
+        MaybeRefreshButton(),
+        PreferencesButton(),
+        NotificationButton(id),
+      ],
       screens: [
         NavigationBarItem(
           builder: (_) => const _AllAssetsScreen(),
@@ -53,10 +63,6 @@ class LibraryScreen extends StatelessWidget {
 class _AllAssetsScreen extends StatelessWidget {
   const _AllAssetsScreen({super.key});
 
-  Future<void> _refresh(WidgetRef ref) {
-    return ref.read(foregroundServiceProvider.notifier).update();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -75,40 +81,10 @@ class _AllAssetsScreen extends StatelessWidget {
             final dynamicLayout = ref.watch(PreferencesProviders.dynamicLayout);
             final renderList = ref.watch(LibraryProviders.renderList(assets));
 
-            return renderList.when(
-              data: (renderList) {
-                return Padding(
-                  padding: const EdgeInsets.only(left: 4),
-                  child: ScrollConfiguration(
-                    // Remove default scroll bar
-                    behavior: ScrollConfiguration.of(context)
-                        .copyWith(scrollbars: false),
-                    child: ImmichAssetGridView(
-                      alwaysVisibleScrollThumb: forPlatform(
-                        desktop: () => true,
-                        mobile: () => false,
-                      ),
-                      dynamicLayout: dynamicLayout,
-                      showStack: true,
-                      renderList: renderList,
-                      assetMaxExtent: maxExtent,
-                      onRefresh: platformValue(
-                        desktop: null,
-                        mobile: () => _refresh(ref),
-                      ),
-                      onTap: (state) {
-                        AppRouter.toAssetViewer(context, state);
-                      },
-                    ),
-                  ),
-                );
-              },
-              error: (e, _) => Text('$e'),
-              loading: () => const Center(
-                child: CircularProgressIndicator(),
-              ),
-              skipLoadingOnReload: true,
-              skipLoadingOnRefresh: true,
+            return LibraryScrollView(
+              maxExtent: maxExtent,
+              dynamicLayout: dynamicLayout,
+              renderList: renderList,
             );
           },
           error: (e, _) {

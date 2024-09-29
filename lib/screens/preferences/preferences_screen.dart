@@ -21,9 +21,12 @@ import 'user/sign_out_widget.dart';
 class PreferencesScreen extends StatelessWidget {
   const PreferencesScreen({super.key});
 
+  static const id = 'preferences_screen';
+
   @override
   Widget build(BuildContext context) {
     return const AppScaffold(
+      id: id,
       showTitleBar: true,
       showBackButton: true,
       body: SingleChildScrollView(

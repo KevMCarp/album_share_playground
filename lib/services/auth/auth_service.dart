@@ -18,7 +18,7 @@ class AuthService {
   late final StreamController<User?> _currentUserStream;
 
   void _init() {
-    _currentUserStream = StreamController(
+    _currentUserStream = StreamController.broadcast(
       onListen: _startAuthStream,
     );
   }
