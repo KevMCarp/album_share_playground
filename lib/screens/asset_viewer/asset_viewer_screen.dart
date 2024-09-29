@@ -18,6 +18,8 @@ class AssetViewerScreen extends ConsumerStatefulWidget {
     super.key,
   });
 
+  static const id = 'asset_viewer_screen';
+
   final AssetViewerScreenState viewerState;
 
   @override
