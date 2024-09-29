@@ -78,7 +78,78 @@
     "twoHours" : "2 Hours",
     "fourHours": "4 Hours",
     "eightHours" : "8 Hours",
-    "twelveHours": "12 Hours"
+    "twelveHours": "12 Hours",
+    "likedPhoto": "{user} liked a photo.",
+    "@likedPhoto" : {
+        "placeholders": {
+            "user" : {
+                "type" : "String"
+            }
+        }
+    },
+    "commentedPhoto" : "{user} commented on a photo.",
+    "@commentedPhoto": {
+        "placeholders": {
+            "user" : {
+                "type" : "String"
+            }
+        }
+    },
+    "likedVideo": "{user} liked a video.",
+    "@likedVideo" : {
+        "placeholders": {
+            "user" : {
+                "type" : "String"
+            }
+        }
+    },
+    "commentedVideo": "{user} commented on a video",
+    "@commentedVideo" : {
+        "placeholders": {
+            "user" : {
+                "type" : "String"
+            }
+        }
+    },
+    "likedAsset": "New like from {user}",
+    "@likedAsset" : {
+        "placeholders": {
+            "user" : {
+                "type" : "String"
+            }
+        }
+    },
+    "commentedAsset" : "{user} left a comment.",
+    "@commentedAsset": {
+        "placeholders": {
+            "user" : {
+                "type" : "String"
+            }
+        }
+    },
+    "commentsCount": "You have {count} new comments.",
+    "@commentsCount" : {
+        "placeholders": {
+            "count" : {
+                "type" : "int"
+            }
+        }
+    },
 
-
+    "likesCount" : "You have {count} new likes.",
+    "@likesCount" : {
+        "placeholders": {
+            "count" : {
+                "type" : "int"
+            }
+        }
+    },
+    "notificationCount" : "You have {count} new notifications.",
+    "@notificationCount" : {
+        "placeholders": {
+            "count" : {
+                "type" : "int"
+            }
+        }
+    }
 }
