@@ -40,6 +40,7 @@ dependencies:
   go_router: ^14.2.7
   humanizer: ^3.0.0
   window_manager: ^0.4.2
+  titlebar_buttons: ^1.0.0
 
 dev_dependencies:
   flutter_test:

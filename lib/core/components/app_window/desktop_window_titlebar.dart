@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:titlebar_buttons/titlebar_buttons.dart';
 import 'package:window_manager/window_manager.dart';
 
 import '../logo_widget.dart';
@@ -169,9 +170,8 @@ class MinimizeWindowButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
+    return DecoratedMinimizeButton(
       onPressed: () => windowManager.minimize(),
-      icon: const Icon(Icons.minimize),
     );
   }
 }
@@ -181,9 +181,8 @@ class MaximizeWindowButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
+    return DecoratedMaximizeButton(
       onPressed: () => DesktopWindowTitlebar.maximiseOrRestore(),
-      icon: const Icon(Icons.maximize),
     );
   }
 }
@@ -193,9 +192,8 @@ class CloseWindowButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
+    return DecoratedCloseButton(
       onPressed: () => windowManager.close(),
-      icon: const Icon(Icons.close),
     );
   }
 }
