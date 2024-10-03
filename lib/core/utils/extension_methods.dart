@@ -1,7 +1,6 @@
 import 'dart:core';
 
 import '../../models/album.dart';
-import '../../models/asset.dart';
 
 extension StringDuration on String {
   Duration? toDuration() {
@@ -41,15 +40,6 @@ extension ListExtensions<E> on Iterable<E> {
   List<T> mapList<T>(T Function(E e) f) => map(f).toList();
 }
 
-extension Unique<E, Id> on List<E> {
-  List<E> unique([Id Function(E element)? id, bool inplace = true]) {
-    final ids = <dynamic>{};
-    var list = inplace ? this : List<E>.from(this);
-    list.retainWhere((x) => ids.add(id != null ? id(x) : x as Id));
-    return list;
-  }
-}
-
 extension AlbumListEquality on List<Album> {
   bool equals(List<Album> albums) {
     if (length != albums.length) {
@@ -61,31 +51,5 @@ extension AlbumListEquality on List<Album> {
       }
     }
     return true;
-  }
-}
-
-extension AssetListSorter on List<Asset> {
-  List<Asset> sorted() {
-    return [...this]..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-  }
-
-  void merge(List<Asset> assets) {
-    if (isEmpty) {
-      addAll(assets);
-      return;
-    }
-    final a = this;
-    for (var asset in assets) {
-      final ind = a.indexWhere((ass) => ass.id == asset.id);
-      if (ind == -1) {
-        a.add(asset);
-      } else {
-        a[ind] = a[ind].merge(asset);
-      }
-    }
-  }
-
-  List<Asset> merged(List<Asset> assets) {
-    return [...this]..merge(assets);
   }
 }
