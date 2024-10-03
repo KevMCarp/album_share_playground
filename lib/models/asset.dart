@@ -58,9 +58,10 @@ class Asset {
 
   Asset merge(Asset asset) {
     assert(this == asset);
+    final newAlbums = asset.albums.where((e) => !albums.contains(e));
     return Asset(
       id: id,
-      albums: [...albums, ...asset.albums],
+      albums: [...newAlbums, ...asset.albums],
       type: type,
       createdAt: createdAt,
       fileName: fileName,
@@ -110,5 +111,31 @@ enum AssetType {
     return AssetType.values.firstWhere(
       (e) => e.name == value.toLowerCase(),
     );
+  }
+}
+
+extension AssetListSorter on List<Asset> {
+  List<Asset> sorted() {
+    return [...this]..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+  }
+
+  void merge(List<Asset> assets) {
+    if (isEmpty) {
+      addAll(assets);
+      return;
+    }
+    final a = this;
+    for (var asset in assets) {
+      final ind = a.indexWhere((ass) => ass.id == asset.id);
+      if (ind == -1) {
+        a.add(asset);
+      } else {
+        a[ind] = a[ind].merge(asset);
+      }
+    }
+  }
+
+  List<Asset> merged(List<Asset> assets) {
+    return [...this]..merge(assets);
   }
 }
