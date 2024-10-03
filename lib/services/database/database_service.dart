@@ -171,11 +171,23 @@ class DatabaseService {
     return _writeTxn(() => _db.users.put(user), 'setUser');
   }
 
-  Future<List<Album>> getAlbums() {
+  Future<List<Album>> allAlbums() {
     return _readTxn(
       () => _db.albums.where().anyIsarId().findAll(),
-      'getAlbums',
+      'allAlbums',
     );
+  }
+
+  Future<List<Album>> albums(List<String> ids) async {
+    final isarIds = ids.mapList(Album.isarIdFromId);
+
+    final albums = await _readTxn(
+      () => _db.albums.getAll(isarIds),
+      'albums',
+    );
+
+    // Remove null entries
+    return albums.whereType<Album>().toList();
   }
 
   Future<void> setAlbums(List<Album> albums) {
