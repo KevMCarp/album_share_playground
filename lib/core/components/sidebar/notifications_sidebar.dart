@@ -14,14 +14,42 @@ import 'app_sidebar.dart';
 class NotificationSidebar extends AppSidebar {
   const NotificationSidebar({super.key});
 
-  @override
   AutoDisposeStreamProvider providerBuilder() {
     return ActivityProviders.notifications;
   }
 
-  @override
   Widget itemBuilder(BuildContext context, Activity activity) {
     return _ActivityContentBuilder(activity);
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final provider = ref.watch(ActivityProviders.notifications);
+    final theme = Theme.of(context);
+    return Drawer(
+      backgroundColor: theme.scaffoldBackgroundColor.withOpacity(0.5),
+      width: AppSidebar.width,
+      child: provider.when(
+        data: (a) {
+          return ListView.builder(
+            itemCount: a.length,
+            itemBuilder: (context, index) {
+              return itemBuilder(context, a[index]);
+            },
+          );
+        },
+        error: (e, _) {
+          return Center(
+            child: Text('$e'),
+          );
+        },
+        loading: () {
+          return const SizedBox();
+        },
+        skipLoadingOnRefresh: true,
+        skipLoadingOnReload: true,
+      ),
+    );
   }
 }
 

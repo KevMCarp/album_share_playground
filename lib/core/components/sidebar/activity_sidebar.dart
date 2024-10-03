@@ -8,6 +8,7 @@ import '../../../models/activity.dart';
 import '../../../models/album.dart';
 import '../../../models/asset.dart';
 import '../../../services/activity/activity_providers.dart';
+import '../../../services/database/database_providers.dart';
 import '../../utils/extension_methods.dart';
 import '../user_avatar.dart';
 import 'app_sidebar.dart';
@@ -15,23 +16,177 @@ import 'app_sidebar.dart';
 class ActivitySidebar extends AppSidebar {
   const ActivitySidebar({
     required this.asset,
-    required this.album,
+    this.album,
     super.key,
-  }) : super(reverse: true);
+  });
 
-  final Album album;
+  final Album? album;
   final Asset asset;
 
   @override
-  AutoDisposeStreamProvider providerBuilder() {
-    return ActivityProviders.assetInAlbum((album: album, asset: asset));
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Drawer(
+      width: AppSidebar.width,
+      backgroundColor:
+          Theme.of(context).scaffoldBackgroundColor.withOpacity(0.5),
+      child: SafeArea(
+        top: false,
+        child: Consumer(
+          builder: (context, ref, child) {
+            if (album != null) {
+              return _ActivityWidget(
+                asset: asset,
+                albums: [album!],
+              );
+            }
+
+            final albumsProvider =
+                ref.watch(DatabaseProviders.albums(asset.albums));
+
+            final albums = albumsProvider.maybeWhen(
+              data: (albums) => albums,
+              orElse: () => <Album>[],
+              skipLoadingOnRefresh: true,
+              skipLoadingOnReload: true,
+            );
+
+            return _ActivityWidget(
+              asset: asset,
+              albums: albums,
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _ActivityWidget extends StatefulWidget {
+  const _ActivityWidget({
+    required this.asset,
+    required this.albums,
+    super.key,
+  });
+
+  final Asset asset;
+  final List<Album> albums;
+
+  @override
+  State<_ActivityWidget> createState() => _ActivityWidgetState();
+}
+
+class _ActivityWidgetState extends State<_ActivityWidget>
+    with TickerProviderStateMixin {
+  TabController? _controller;
+  int _index = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _setTabController();
   }
 
   @override
-  Widget? bottomItemBuilder(BuildContext context) =>
-      _SendMessageWidget(albumId: album.id, assetId: asset.id);
+  void didUpdateWidget(covariant _ActivityWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (_index <= widget.albums.length) {
+      _setTabController();
+      _index = widget.albums.length - 1;
+    }
+  }
+
+  void _setTabController() {
+    _controller?.dispose();
+    _controller = TabController(
+      length: widget.albums.length,
+      vsync: this,
+    );
+    _controller!.addListener(_tabChangedListener);
+  }
+
+  void _tabChangedListener() {
+    setState(() {
+      _index = _controller!.index;
+    });
+  }
+
+  Future<void> _sendMessage(String value, WidgetRef ref) {
+    return ref.read(ActivityProviders.uploadService).uploadComment(
+          widget.albums[_index].id,
+          widget.asset.id,
+          value,
+        );
+  }
 
   @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.albums.isEmpty) {
+      print('No album found');
+      return const SizedBox();
+    }
+    print('Albums found: ${widget.albums.length}');
+    return Column(
+      children: [
+        TabBar(
+          controller: _controller,
+          indicatorColor: Colors.white,
+          labelColor: Colors.white,
+          tabs: widget.albums.mapList(
+            (a) => Tab(
+              text: a.name,
+              height: 30,
+            ),
+          ),
+        ),
+        Expanded(
+          child: TabBarView(
+            controller: _controller,
+            children: widget.albums.mapList(
+              (a) => Consumer(
+                builder: (context, ref, child) {
+                  final provider = ref.watch(ActivityProviders.assetInAlbum(
+                      (album: a, asset: widget.asset)));
+                  return provider.when(
+                    data: (activity) {
+                      return ListView.builder(
+                        reverse: true,
+                        itemCount: activity.length,
+                        itemBuilder: (context, index) {
+                          return itemBuilder(context, activity[index]);
+                        },
+                      );
+                    },
+                    error: (e, _) {
+                      return Center(
+                        child: Text('$e'),
+                      );
+                    },
+                    loading: () {
+                      return const SizedBox();
+                    },
+                    skipLoadingOnRefresh: true,
+                    skipLoadingOnReload: true,
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+        Consumer(
+          builder: (context, ref, child) => _SendMessageWidget(
+            onSaved: (value) => _sendMessage(value, ref),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget itemBuilder(BuildContext context, Activity activity) {
     final theme = Theme.of(context);
     const size = 34.0;
@@ -76,21 +231,19 @@ class ActivitySidebar extends AppSidebar {
   }
 }
 
-class _SendMessageWidget extends ConsumerStatefulWidget {
+class _SendMessageWidget extends StatefulWidget {
   const _SendMessageWidget({
-    required this.albumId,
-    required this.assetId,
+    required this.onSaved,
     super.key,
   });
 
-  final String albumId;
-  final String assetId;
+  final Future<void> Function(String value) onSaved;
 
   @override
-  ConsumerState<_SendMessageWidget> createState() => _SendMessageWidgetState();
+  State<_SendMessageWidget> createState() => __SendMessageWidgetState();
 }
 
-class _SendMessageWidgetState extends ConsumerState<_SendMessageWidget> {
+class __SendMessageWidgetState extends State<_SendMessageWidget> {
   final TextEditingController _controller = TextEditingController();
 
   Timer? _timer;
@@ -109,9 +262,7 @@ class _SendMessageWidgetState extends ConsumerState<_SendMessageWidget> {
   }
 
   void _saveMessage() async {
-    await ref
-        .read(ActivityProviders.uploadService)
-        .uploadComment(widget.albumId, widget.assetId, _controller.text);
+    await widget.onSaved(_controller.text);
     _controller.clear();
   }
 
