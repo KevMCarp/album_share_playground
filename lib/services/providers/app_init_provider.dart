@@ -16,24 +16,26 @@ final appInitProvider = FutureProvider((ref) async {
   // Init the logger service.
   AppLogger.instance;
 
-  final logger = Logger('UncaughtErrorLogger');
+  if (!kDebugMode) {
+    final logger = Logger('UncaughtErrorLogger');
 
-  FlutterError.onError = (details) {
-    FlutterError.presentError(details);
-    logger.severe(
-      'FlutterError',
-      '"${details.toString()}\n'
-          'Exception: ${details.exception}\n'
-          'Library: ${details.library}\n'
-          'Context: ${details.context}"',
-      details.stack,
-    );
-  };
+    FlutterError.onError = (details) {
+      FlutterError.presentError(details);
+      logger.severe(
+        'FlutterError',
+        '"${details.toString()}\n'
+            'Exception: ${details.exception}\n'
+            'Library: ${details.library}\n'
+            'Context: ${details.context}"',
+        details.stack,
+      );
+    };
 
-  PlatformDispatcher.instance.onError = (error, stack) {
-    logger.severe('PlatformDispatcher', error, stack);
-    return true;
-  };
+    PlatformDispatcher.instance.onError = (error, stack) {
+      logger.severe('PlatformDispatcher', error, stack);
+      return true;
+    };
+  }
 
   final apiService = ref.watch(ApiProviders.service);
   await apiService.checkEndpoint();
