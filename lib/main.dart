@@ -7,11 +7,12 @@ import 'package:window_manager/window_manager.dart';
 import 'core/main/app_lifecycle_scope.dart';
 import 'core/main/locale_scope.dart';
 import 'core/main/main_app.dart';
+import 'core/utils/platform_utils.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  windowManager.ensureInitialized();
   VideoPlayer.ensureInitialized();
+  forDesktop(windowManager.ensureInitialized);
 
   runApp(
     const ProviderScope(
