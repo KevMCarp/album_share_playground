@@ -16,8 +16,10 @@ class Album {
     required this.lastUpdated,
   });
 
+  static int isarIdFromId(String id) => fastHash(id);
+
   /// Used only for offline storage
-  Id get isarId => fastHash(id);
+  Id get isarId => isarIdFromId(id);
 
   final String id;
   final String name;
@@ -62,4 +64,3 @@ class Album {
     return other is Album && other.id == id;
   }
 }
-
