@@ -219,6 +219,11 @@ class ImmichAssetGridViewState extends ConsumerState<ImmichAssetGridView> {
       _indexInView = firstInView.index;
     }
 
+    if (firstInView.index == _indexInView &&
+        firstInView.itemLeadingEdge == _indexInViewOffset) {
+      return;
+    }
+
     if (firstInView.index > _indexInView) {
       saveIndex();
       saveOffset();
