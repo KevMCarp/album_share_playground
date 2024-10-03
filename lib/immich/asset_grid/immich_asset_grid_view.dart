@@ -3,10 +3,6 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:math';
 
-import 'package:album_share/core/components/scaffold/app_scaffold.dart';
-import 'package:album_share/core/utils/extension_methods.dart';
-import 'package:album_share/screens/asset_viewer/asset_viewer_screen_state.dart';
-import 'package:album_share/services/providers/app_bar_listener.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
