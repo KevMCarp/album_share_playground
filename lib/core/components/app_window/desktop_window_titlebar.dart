@@ -157,10 +157,7 @@ class MoveWindow extends StatelessWidget {
     return GestureDetector(
       onDoubleTap: () => DesktopWindowTitlebar.maximiseOrRestore(),
       onPanStart: (_) => windowManager.startDragging(),
-      child: ColoredBox(
-        color: Colors.yellow,
-        child: child,
-      ),
+      child: ColoredBox(color: Colors.transparent, child: child),
     );
   }
 }
