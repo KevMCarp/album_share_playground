@@ -1,14 +1,14 @@
-import '../../core/components/titlebar_buttons/activity_button.dart';
-import '../../services/providers/sidebar_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/components/scaffold/app_scaffold.dart';
 import '../../core/components/sidebar/activity_sidebar.dart';
+import '../../core/components/titlebar_buttons/activity_button.dart';
 import '../../core/utils/extension_methods.dart';
 import '../../models/asset.dart';
 import '../../services/providers/app_bar_listener.dart';
+import '../../services/providers/sidebar_listener.dart';
 import 'asset_viewer_screen_state.dart';
 import 'asset_viewer_widget.dart';
 
@@ -55,8 +55,7 @@ class _AssetViewerScreenState extends ConsumerState<AssetViewerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bool showActivity =
-        widget.viewerState.album != null && _asset != null;
+    final bool showActivity = _asset != null;
     return AppScaffold(
       id: AssetViewerScreen.id,
       showTitleBar: true,
@@ -68,7 +67,7 @@ class _AssetViewerScreenState extends ConsumerState<AssetViewerScreen> {
       sidebar: showActivity
           ? ActivitySidebar(
               asset: _asset!,
-              album: widget.viewerState.album!,
+              album: widget.viewerState.album,
             )
           : null,
       body: AssetViewerWidget(
