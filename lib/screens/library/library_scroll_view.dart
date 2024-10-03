@@ -5,7 +5,7 @@ import '../../core/utils/platform_utils.dart';
 import '../../immich/asset_grid/asset_grid_data_structure.dart';
 import '../../immich/asset_grid/immich_asset_grid_view.dart';
 import '../../routes/app_router.dart';
-import '../../services/foreground/foreground_service_provider.dart';
+import '../../services/sync/foreground_sync_service_provider.dart';
 
 class LibraryScrollView extends ConsumerStatefulWidget {
   const LibraryScrollView({
@@ -26,7 +26,7 @@ class LibraryScrollView extends ConsumerStatefulWidget {
 class _LibraryScrollViewState extends ConsumerState<LibraryScrollView>
     with AutomaticKeepAliveClientMixin {
   Future<void> _refresh(WidgetRef ref) {
-    return ref.read(foregroundServiceProvider.notifier).update();
+    return ref.read(foregroundSyncServiceProvider.notifier).update();
   }
 
   @override

@@ -13,8 +13,8 @@ import '../api/api_service.dart';
 import '../database/database_service.dart';
 import '../notifications/notifications_service.dart';
 
-class ForegroundService extends StateNotifier<SyncState> {
-  ForegroundService(
+class SyncService extends StateNotifier<SyncState> {
+  SyncService(
     this._syncFrequency,
     this._api,
     this._db,
@@ -73,7 +73,7 @@ class ForegroundService extends StateNotifier<SyncState> {
       return [];
     }
 
-    final offlineAlbums = await _db.getAlbums();
+    final offlineAlbums = await _db.allAlbums();
 
     // Downloaded new assets.
     bool assetsUpdated = false;
@@ -185,6 +185,17 @@ class ForegroundService extends StateNotifier<SyncState> {
     if (activity.isEmpty) {
       return;
     }
+    final user = await _db.getUser();
+    if (user == null) {
+      return;
+    }
+    // Activity relevant for current user.
+    // Removes anything posted by this user.
+    final activityForUser = activity.where((a) => a.user.id == user.id);
+    if (activityForUser.isEmpty) {
+      return;
+    }
+
     final locale = AppLocale.instance.current;
     if (activity.length == 1) {
       final activ = activity[0];

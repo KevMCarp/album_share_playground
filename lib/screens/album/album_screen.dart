@@ -7,7 +7,7 @@ import '../../core/utils/platform_utils.dart';
 import '../../immich/asset_grid/immich_asset_grid_view.dart';
 import '../../models/album.dart';
 import '../../routes/app_router.dart';
-import '../../services/foreground/foreground_service_provider.dart';
+import '../../services/sync/foreground_sync_service_provider.dart';
 import '../../services/library/library_providers.dart';
 import '../../services/preferences/preferences_providers.dart';
 import '../library/library_screen.dart';
@@ -41,14 +41,14 @@ class _AlbumsScreen extends ConsumerWidget {
   final Album album;
 
   Future<void> _refresh(WidgetRef ref) {
-    return ref.read(foregroundServiceProvider.notifier).update();
+    return ref.read(foregroundSyncServiceProvider.notifier).update();
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Center(
       child: Consumer(builder: (context, ref, child) {
-        final syncService = ref.watch(foregroundServiceProvider);
+        final syncService = ref.watch(foregroundSyncServiceProvider);
 
         if (syncService.firstRun && !syncService.assets) {
           return const BuildingLibraryWidget();

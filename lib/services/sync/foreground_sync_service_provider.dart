@@ -4,16 +4,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../api/api_provider.dart';
 import '../database/database_providers.dart';
 import '../preferences/preferences_providers.dart';
-import 'foreground_service.dart';
+import 'sync_service.dart';
 
-final foregroundServiceProvider =
-    StateNotifierProvider.autoDispose<ForegroundService, SyncState>((ref) {
+final foregroundSyncServiceProvider =
+    StateNotifierProvider.autoDispose<SyncService, SyncState>((ref) {
   final db = ref.watch(DatabaseProviders.service);
   final api = ref.watch(ApiProviders.service);
   final syncFrequency = ref.watch(PreferencesProviders.syncFrequency);
   final notifications = ForegroundNotificationsService();
 
-  final service = ForegroundService(syncFrequency, api, db, notifications);
+  final service = SyncService(syncFrequency, api, db, notifications);
 
   service.start();
 
