@@ -9,8 +9,7 @@ import '../../screens/asset_viewer/asset_viewer_screen_state.dart';
 import 'notifications_service.dart';
 
 class ForegroundNotificationsService extends NotificationsService {
-  @override
-  Future<void> notify({
+  Future<void> _notify({
     String? title,
     required String content,
     List<Asset> assets = const [],
@@ -42,4 +41,28 @@ class ForegroundNotificationsService extends NotificationsService {
             },
     );
   }
+
+  @override
+  Future<void> activity({
+    String? title,
+    required String content,
+    List<Asset> assets = const [],
+  }) =>
+      _notify(
+        title: title,
+        content: content,
+        assets: assets,
+      );
+
+  @override
+  Future<void> assets({
+    String? title,
+    required String content,
+    List<Asset> assets = const [],
+  }) =>
+      _notify(
+        title: title,
+        content: content,
+        assets: assets,
+      );
 }

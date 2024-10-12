@@ -5,6 +5,7 @@ import 'package:logging/logging.dart';
 import '../api/api_provider.dart';
 import '../database/database_providers.dart';
 import '../logger/app_logger.dart';
+import '../sync/background_sync_service.dart';
 
 final appInitProvider = FutureProvider((ref) async {
   // Ensure cookies are retrieved from storage.
@@ -12,6 +13,11 @@ final appInitProvider = FutureProvider((ref) async {
 
   final database = ref.watch(DatabaseProviders.service);
   await database.init();
+
+  final prefs = await database.getPreferences();
+  if (prefs != null && (prefs.backgroundSync ?? false)) {
+    BackgroundSyncService.instance.register();
+  }
 
   // Init the logger service.
   AppLogger.instance;
