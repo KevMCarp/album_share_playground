@@ -8,6 +8,7 @@ import '../../../models/asset.dart';
 import '../notifications_service.dart';
 
 part 'android_background_notifications.dart';
+part 'fallback_background_notifications_service.dart';
 part 'ios_background_notifications_service.dart';
 part 'macos_background_notifications_service.dart';
 
@@ -23,14 +24,32 @@ abstract class BackgroundNotificationsService extends NotificationsService {
     _init();
   }
 
+  /// Currently not all platforms support background notifications.
+  static bool isSupportedPlatform() {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+      case TargetPlatform.iOS:
+      case TargetPlatform.macOS:
+        return true;
+      case TargetPlatform.linux:
+      case TargetPlatform.windows:
+      case TargetPlatform.fuchsia:
+        return false;
+    }
+  }
+
   static BackgroundNotificationsService forPlatform() {
+    assert(
+      isSupportedPlatform(),
+      'Background notifications can only be used on supported platforms',
+    );
     return switch (defaultTargetPlatform) {
       TargetPlatform.android => _AndroidBackgroundNotificationsService(),
       TargetPlatform.iOS => _IosBackgroundNotificationsService(),
       TargetPlatform.macOS => _MacosBackgroundNotificationsService(),
-      TargetPlatform.linux => throw UnimplementedError(),
-      TargetPlatform.windows => throw UnimplementedError(),
-      TargetPlatform.fuchsia => throw UnimplementedError(),
+      TargetPlatform.linux => _FallbackBackgroundNotificationsService(),
+      TargetPlatform.windows => _FallbackBackgroundNotificationsService(),
+      TargetPlatform.fuchsia => _FallbackBackgroundNotificationsService(),
     };
   }
 
