@@ -24,25 +24,7 @@ abstract class BackgroundNotificationsService extends NotificationsService {
     _init();
   }
 
-  /// Currently not all platforms support background notifications.
-  static bool isSupportedPlatform() {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-      case TargetPlatform.iOS:
-      case TargetPlatform.macOS:
-        return true;
-      case TargetPlatform.linux:
-      case TargetPlatform.windows:
-      case TargetPlatform.fuchsia:
-        return false;
-    }
-  }
-
   static BackgroundNotificationsService forPlatform() {
-    assert(
-      isSupportedPlatform(),
-      'Background notifications can only be used on supported platforms',
-    );
     return switch (defaultTargetPlatform) {
       TargetPlatform.android => _AndroidBackgroundNotificationsService(),
       TargetPlatform.iOS => _IosBackgroundNotificationsService(),
