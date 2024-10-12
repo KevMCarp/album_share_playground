@@ -12,6 +12,7 @@ class PlatformSwitchListTile extends StatelessWidget {
     this.isThreeLine = false,
     required this.value,
     required this.onChanged,
+    this.contentPadding,
     super.key,
   });
 
@@ -20,6 +21,7 @@ class PlatformSwitchListTile extends StatelessWidget {
   final bool isThreeLine;
   final bool value;
   final void Function(bool v) onChanged;
+  final EdgeInsetsGeometry? contentPadding;
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +41,7 @@ class PlatformSwitchListTile extends StatelessWidget {
               : null,
         ),
       ),
+      contentPadding: contentPadding,
     );
   }
 }
