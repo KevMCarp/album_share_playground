@@ -85,6 +85,10 @@ class DatabaseService {
     }
   }
 
+  Future<void> close() async {
+    await _isar?.close();
+  }
+
   /// Removes all data from the offline database.
   ///
   /// Endpoint retained unless [endpoint] set to true.

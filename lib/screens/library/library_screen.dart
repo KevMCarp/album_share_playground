@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:octo_image/octo_image.dart';
 
@@ -9,31 +10,55 @@ import '../../core/components/sidebar/notifications_sidebar.dart';
 import '../../core/components/titlebar_buttons/notification_button.dart';
 import '../../core/components/titlebar_buttons/preferences_button.dart';
 import '../../core/components/titlebar_buttons/refresh_button.dart';
+import '../../core/components/titlebar_buttons/test_notification_button.dart';
+import '../../core/dialogs/background_sync_dialog.dart';
 import '../../core/utils/app_localisations.dart';
 import '../../core/utils/platform_utils.dart';
 import '../../immich/asset_grid/immich_thumbnail.dart';
 import '../../models/album.dart';
 import '../../routes/app_router.dart';
-import '../../services/sync/foreground_sync_service_provider.dart';
+import '../../services/database/database_service.dart';
 import '../../services/library/library_providers.dart';
 import '../../services/preferences/preferences_providers.dart';
+import '../../services/sync/foreground_sync_service_provider.dart';
 import 'library_scroll_view.dart';
 
-class LibraryScreen extends StatelessWidget {
+class LibraryScreen extends StatefulWidget {
   const LibraryScreen({super.key});
 
   static const id = 'library_screen';
 
   @override
+  State<LibraryScreen> createState() => _LibraryScreenState();
+}
+
+class _LibraryScreenState extends State<LibraryScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _getBackgroundPermissions();
+  }
+
+  void _getBackgroundPermissions() async {
+    final prefs = await DatabaseService.instance.getPreferences();
+    if (prefs?.backgroundSync == null) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        showBackgroundSyncDialog(context);
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AppNavigationScaffold(
-      id: id,
+      id: LibraryScreen.id,
       showBackButton: false,
       sidebar: const NotificationSidebar(),
       titleBarIcons: const [
+        TestNotificationButton(),
         MaybeRefreshButton(),
         PreferencesButton(),
-        NotificationButton(id),
+        NotificationButton(LibraryScreen.id),
       ],
       screens: [
         NavigationBarItem(

@@ -15,18 +15,16 @@ import '../notifications/notifications_service.dart';
 
 class SyncService extends StateNotifier<SyncState> {
   SyncService(
-    this._syncFrequency,
     this._api,
     this._db,
     this._notifications,
   ) : super(_getInitialState(_db));
 
-  final int _syncFrequency;
   final ApiService _api;
   final DatabaseService _db;
   final NotificationsService _notifications;
 
-  final _logger = Logger('ForegroundService');
+  final _logger = Logger('SyncService');
 
   Timer? _timer;
 
@@ -35,11 +33,11 @@ class SyncService extends StateNotifier<SyncState> {
     return SyncState(!haveAssets);
   }
 
-  void start() async {
+  void start(int syncFrequency) async {
     _logger.info('Starting');
     await update();
     _timer = Timer.periodic(
-      _syncFrequency.seconds,
+      syncFrequency.seconds,
       (_) {
         _logger.info('Checking for updates');
         unawaited(update());
@@ -204,7 +202,7 @@ class SyncService extends StateNotifier<SyncState> {
         asset = await _db.asset(id: activ.assetId!);
       }
       if (asset != null) {
-        _notifications.notify(
+        _notifications.activity(
           title: activ.describe(locale, asset),
           content: activ.comment ?? '❤️',
           assets: [asset],
@@ -217,20 +215,20 @@ class SyncService extends StateNotifier<SyncState> {
     final hasComments = activity.any((e) => e.type == ActivityType.comment);
 
     if (hasLikes && hasComments) {
-      _notifications.notify(
+      _notifications.activity(
         content: locale.notificationCount(activity.length),
       );
       return;
     }
     // Likes only
     if (hasLikes) {
-      _notifications.notify(
+      _notifications.activity(
         content: locale.likesCount(activity.length),
       );
       return;
     }
     // Comments only
-    _notifications.notify(
+    _notifications.activity(
       content: locale.commentsCount(activity.length),
     );
   }

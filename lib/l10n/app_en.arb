@@ -70,7 +70,7 @@
     "clipboardSave": "Saved to clipboard",
     "support" : "Support",
     "syncFrequency": "Sync Frequency",
-    "syncFrequencyDescription": "How often to check for new assets and activity.",
+    "syncFrequencyDescription": "How often to check for new assets and activity when the app is open.",
     "fiveMinutes": "5 Minutes",
     "fifteenMinutes": "15 Minutes",
     "thirtyMinutes" : "30 Minutes",
@@ -151,5 +151,10 @@
                 "type" : "int"
             }
         }
-    }
-}
+    },
+    "backgroundSync": "Background Sync",
+    "backgroundSyncDescription": "Allow checking for new assets and activity when the app is closed.",
+    "batteryOptimisations": "Battery optimisations",
+    "batteryOptimisationsMessage": "Some Android manufacturers prefer battery life over proper app functionality. \n\nIt is recommended you disable battery optimisations for Album Share to ensure background sync can be performed and notifications are delivered as expected. \n\nFor more information, please visit:",
+    "save": "Save"
+}   

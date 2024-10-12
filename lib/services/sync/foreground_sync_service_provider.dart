@@ -13,9 +13,9 @@ final foregroundSyncServiceProvider =
   final syncFrequency = ref.watch(PreferencesProviders.syncFrequency);
   final notifications = ForegroundNotificationsService();
 
-  final service = SyncService(syncFrequency, api, db, notifications);
+  final service = SyncService(api, db, notifications);
 
-  service.start();
+  service.start(syncFrequency);
 
   return service;
 });
