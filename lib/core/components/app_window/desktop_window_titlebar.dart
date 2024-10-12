@@ -21,33 +21,6 @@ class DesktopWindowTitlebar extends StatelessWidget {
 
   final List<Widget> titleBarIcons;
 
-  static void setTitle(String title) {
-    windowManager.setTitle(title);
-  }
-
-  static void openWindow(String title) async {
-    final windowOptions = WindowOptions(
-      minimumSize: const Size(300, 500),
-      title: title,
-      titleBarStyle: TitleBarStyle.hidden,
-    );
-    await windowManager.waitUntilReadyToShow(windowOptions, () async {
-      await windowManager.show();
-      await windowManager.focus();
-    });
-  }
-
-  static void maximiseOrRestore() async {
-    if (await windowManager.isMaximized()) {
-      await windowManager.unmaximize();
-      return;
-    }
-
-    if (await windowManager.isMaximizable()) {
-      await windowManager.maximize();
-    }
-  }
-
   /// If true, displays the app logo and name in the top bar.
   final bool showTitle;
 
@@ -155,7 +128,7 @@ class MoveWindow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onDoubleTap: () => DesktopWindowTitlebar.maximiseOrRestore(),
+      onDoubleTap: () => AppWindow.maximiseOrRestore(),
       onPanStart: (_) => windowManager.startDragging(),
       child: ColoredBox(color: Colors.transparent, child: child),
     );
@@ -179,7 +152,7 @@ class MaximizeWindowButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DecoratedMaximizeButton(
-      onPressed: () => DesktopWindowTitlebar.maximiseOrRestore(),
+      onPressed: () => AppWindow.maximiseOrRestore(),
     );
   }
 }
