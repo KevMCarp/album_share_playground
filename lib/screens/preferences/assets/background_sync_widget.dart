@@ -36,6 +36,13 @@ class BackgroundSyncWidget extends StatelessWidget {
     onChanged(value);
   }
 
+  void Function(bool value)? _canChange(void Function(bool value) callback) {
+    if (BackgroundSyncService.isSupportedPlatform()) {
+      return callback;
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final locale = AppLocalizations.of(context)!;
@@ -44,7 +51,7 @@ class BackgroundSyncWidget extends StatelessWidget {
       subtitle: Text(locale.backgroundSyncDescription),
       isThreeLine: true,
       value: value ?? false,
-      onChanged: (v) => _onChanged(v, context),
+      onChanged: _canChange((v) => _onChanged(v, context)),
     );
   }
 }

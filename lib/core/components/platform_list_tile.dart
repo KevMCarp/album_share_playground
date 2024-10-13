@@ -20,7 +20,7 @@ class PlatformSwitchListTile extends StatelessWidget {
   final Widget? subtitle;
   final bool isThreeLine;
   final bool value;
-  final void Function(bool v) onChanged;
+  final void Function(bool v)? onChanged;
   final EdgeInsetsGeometry? contentPadding;
 
   @override
@@ -30,7 +30,7 @@ class PlatformSwitchListTile extends StatelessWidget {
       title: title,
       subtitle: subtitle,
       isThreeLine: isThreeLine,
-      onTap: () => onChanged(!value),
+      onTap: onChanged == null ? null : () => onChanged!(!value),
       trailing: Transform.scale(
         scale: forPlatform(desktop: () => 0.8, mobile: () => 1.0),
         child: Switch.adaptive(

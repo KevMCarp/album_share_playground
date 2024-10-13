@@ -104,13 +104,14 @@ class _CupertinoWindowTitlebar extends StatelessWidget {
             ),
           ),
           ...titleBarIcons,
-          const Padding(
-            padding: EdgeInsets.all(4.0),
-            child: SizedBox(
-              height: 16,
-              child: LogoImage(),
+          if (showTitle)
+            const Padding(
+              padding: EdgeInsets.all(4.0),
+              child: SizedBox(
+                height: 16,
+                child: LogoImage(),
+              ),
             ),
-          ),
         ],
       ),
     );

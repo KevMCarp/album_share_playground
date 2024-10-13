@@ -45,6 +45,13 @@ class _BackgroundSyncDialog extends ConsumerWidget {
         .setValue(backgroundSync: current);
   }
 
+  void Function(bool value)? _canChange(void Function(bool value) callback) {
+    if (BackgroundSyncService.isSupportedPlatform()) {
+      return callback;
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final locale = AppLocalizations.of(context)!;
@@ -57,7 +64,7 @@ class _BackgroundSyncDialog extends ConsumerWidget {
         contentPadding: const EdgeInsets.all(0),
         subtitle: Text(locale.backgroundSyncDescription),
         value: bgSync,
-        onChanged: (v) => _set(ref, context, bgSync, v),
+        onChanged: _canChange((v) => _set(ref, context, bgSync, v)),
       ),
     );
   }

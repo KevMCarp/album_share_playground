@@ -14,9 +14,11 @@ final appInitProvider = FutureProvider((ref) async {
   final database = ref.watch(DatabaseProviders.service);
   await database.init();
 
-  final prefs = await database.getPreferences();
-  if (prefs != null && (prefs.backgroundSync ?? false)) {
-    BackgroundSyncService.instance.register();
+  if (BackgroundSyncService.isSupportedPlatform()) {
+    final prefs = await database.getPreferences();
+    if (prefs != null && (prefs.backgroundSync ?? false)) {
+      BackgroundSyncService.instance.register();
+    }
   }
 
   // Init the logger service.

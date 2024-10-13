@@ -1,3 +1,4 @@
+import 'package:album_share/services/sync/background_sync_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -40,6 +41,9 @@ class _LibraryScreenState extends State<LibraryScreen> {
   }
 
   void _getBackgroundPermissions() async {
+    if (!BackgroundSyncService.isSupportedPlatform()) {
+      return;
+    }
     final prefs = await DatabaseService.instance.getPreferences();
     if (prefs?.backgroundSync == null) {
       SchedulerBinding.instance.addPostFrameCallback((_) {

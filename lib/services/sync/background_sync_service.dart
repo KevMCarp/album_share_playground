@@ -22,13 +22,29 @@ class BackgroundSyncService {
     return _instance ??= BackgroundSyncService._();
   }
 
+  //TODO: Remove once all platforms are supported.
+  /// Not all platforms are currently supported.
+  static bool isSupportedPlatform() {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+      case TargetPlatform.iOS:
+        return true;
+      case TargetPlatform.macOS:
+      case TargetPlatform.linux:
+      case TargetPlatform.windows:
+      case TargetPlatform.fuchsia:
+        return false;
+    }
+  }
+
   bool _registered = false;
 
   void register() async {
-    final platform = defaultTargetPlatform;
-    if (platform != TargetPlatform.android && platform != TargetPlatform.iOS) {
-      return;
-    }
+    assert(
+      isSupportedPlatform(),
+      'Unable to register background processes on this platform '
+      'until a platform specific implementation has been created.',
+    );
     if (!_registered) {
       _registered = true;
       return _register();
