@@ -9,6 +9,7 @@ part 'asset.g.dart';
 class Asset {
   const Asset({
     required this.id,
+    required this.ownerId,
     required this.albums,
     required this.type,
     required this.createdAt,
@@ -24,6 +25,7 @@ class Asset {
   Id get isarId => Isar.autoIncrement;
 
   final String id;
+  final String ownerId;
 
   /// A list of album ids associated with this asset.
   final List<String> albums;
@@ -43,6 +45,7 @@ class Asset {
     final exif = json['exifInfo'] as Map<String, dynamic>?;
     return Asset(
       id: json['id'],
+      ownerId: json['ownerId'],
       albums: [albumId],
       type: AssetType.fromString(json['type']),
       createdAt: DateTime.parse(json['fileCreatedAt']),
@@ -61,7 +64,8 @@ class Asset {
     final newAlbums = asset.albums.where((e) => !albums.contains(e));
     return Asset(
       id: id,
-      albums: [...newAlbums, ...asset.albums],
+      ownerId: ownerId,
+      albums: [...newAlbums, ...albums],
       type: type,
       createdAt: createdAt,
       fileName: fileName,
