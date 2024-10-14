@@ -239,11 +239,11 @@ class ApiService {
   /// Gets assets for the selected album.
   ///
   /// Throws [ApiException] if unsuccessful.
-  Future<List<Asset>> getAlbumAssets(String albumId) async {
+  Future<List<Asset>> getAlbumAssets(Album album) async {
     _expectEndpointSet();
 
     final body = await _get(
-      '/api/albums/$albumId',
+      '/api/albums/${album.id}',
       expected: JSON_MAP,
     );
 
@@ -251,7 +251,7 @@ class ApiService {
 
     return assets
         .map((e) => Asset.fromJson(
-              albumId,
+              album.id,
               JsonMap.from(e),
             ))
         .toList();
