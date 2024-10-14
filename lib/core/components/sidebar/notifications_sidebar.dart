@@ -32,8 +32,19 @@ class NotificationSidebar extends AppSidebar {
       child: provider.when(
         data: (a) {
           return ListView.builder(
-            itemCount: a.length,
+            itemCount: a.length + 1,
             itemBuilder: (context, index) {
+              if (index == 0) {
+                return Center(
+                    child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    'Activity',
+                    style: theme.textTheme.labelLarge,
+                  ),
+                ));
+              }
+              index--;
               return itemBuilder(context, a[index]);
             },
           );
