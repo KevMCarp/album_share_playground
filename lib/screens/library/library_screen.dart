@@ -1,4 +1,3 @@
-import 'package:album_share/services/sync/background_sync_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -11,7 +10,6 @@ import '../../core/components/sidebar/notifications_sidebar.dart';
 import '../../core/components/titlebar_buttons/notification_button.dart';
 import '../../core/components/titlebar_buttons/preferences_button.dart';
 import '../../core/components/titlebar_buttons/refresh_button.dart';
-import '../../core/components/titlebar_buttons/test_notification_button.dart';
 import '../../core/dialogs/background_sync_dialog.dart';
 import '../../core/utils/app_localisations.dart';
 import '../../core/utils/platform_utils.dart';
@@ -21,6 +19,7 @@ import '../../routes/app_router.dart';
 import '../../services/database/database_service.dart';
 import '../../services/library/library_providers.dart';
 import '../../services/preferences/preferences_providers.dart';
+import '../../services/sync/background_sync_service.dart';
 import '../../services/sync/foreground_sync_service_provider.dart';
 import 'library_scroll_view.dart';
 
@@ -59,7 +58,6 @@ class _LibraryScreenState extends State<LibraryScreen> {
       showBackButton: false,
       sidebar: const NotificationSidebar(),
       titleBarIcons: const [
-        TestNotificationButton(),
         MaybeRefreshButton(),
         PreferencesButton(),
         NotificationButton(LibraryScreen.id),
@@ -90,7 +88,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
 }
 
 class _AllAssetsScreen extends StatelessWidget {
-  const _AllAssetsScreen({super.key});
+  const _AllAssetsScreen();
 
   @override
   Widget build(BuildContext context) {
@@ -131,7 +129,7 @@ class _AllAssetsScreen extends StatelessWidget {
 }
 
 class _AlbumsScreen extends ConsumerWidget {
-  const _AlbumsScreen({super.key});
+  const _AlbumsScreen();
 
   void _onTap(BuildContext context, Album album) {
     AppRouter.toAlbum(context, album);
