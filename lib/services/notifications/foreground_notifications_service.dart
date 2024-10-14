@@ -16,6 +16,8 @@ class ForegroundNotificationsService extends NotificationsService {
   }) {
     final context = snackbarKey.currentContext!;
 
+    assert(content.isNotEmpty);
+
     return AppSnackbar.info(
       context: context,
       title: title,
