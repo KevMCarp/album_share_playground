@@ -15,7 +15,7 @@ Future<void> showBatteryOptimisationsDialog(BuildContext context) {
 }
 
 class _BatteryOptimisationsDialog extends StatelessWidget {
-  const _BatteryOptimisationsDialog({super.key});
+  const _BatteryOptimisationsDialog();
 
   void _launchUrl(BuildContext context) async {
     if (!await launchUrl(Uri.parse(_dontKillMyAppUrl)) && context.mounted) {
