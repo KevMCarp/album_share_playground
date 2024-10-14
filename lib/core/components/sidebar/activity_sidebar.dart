@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:album_share/core/utils/app_localisations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -65,7 +66,6 @@ class _ActivityWidget extends StatefulWidget {
   const _ActivityWidget({
     required this.asset,
     required this.albums,
-    super.key,
   });
 
   final Asset asset;
@@ -126,24 +126,25 @@ class _ActivityWidgetState extends State<_ActivityWidget>
 
   @override
   Widget build(BuildContext context) {
+    final tabColour = Theme.of(context).colorScheme.onSurface;
     if (widget.albums.isEmpty) {
-      print('No album found');
       return const SizedBox();
     }
-    print('Albums found: ${widget.albums.length}');
     return Column(
       children: [
-        TabBar(
-          controller: _controller,
-          indicatorColor: Colors.white,
-          labelColor: Colors.white,
-          tabs: widget.albums.mapList(
-            (a) => Tab(
-              text: a.name,
-              height: 30,
+        if (widget.albums.length > 1)
+          TabBar(
+            controller: _controller,
+            indicatorColor: tabColour,
+            labelColor: tabColour,
+            tabs: widget.albums.mapList(
+              (a) => Tab(
+                text: a.name,
+                height: 30,
+              ),
             ),
+            dividerColor: Colors.transparent,
           ),
-        ),
         Expanded(
           child: TabBarView(
             controller: _controller,
@@ -154,6 +155,11 @@ class _ActivityWidgetState extends State<_ActivityWidget>
                       (album: a, asset: widget.asset)));
                   return provider.when(
                     data: (activity) {
+                      if (activity.isEmpty) {
+                        return Center(
+                          child: Text(AppLocalizations.of(context)!.noActivity),
+                        );
+                      }
                       return ListView.builder(
                         reverse: true,
                         itemCount: activity.length,
@@ -234,7 +240,6 @@ class _ActivityWidgetState extends State<_ActivityWidget>
 class _SendMessageWidget extends StatefulWidget {
   const _SendMessageWidget({
     required this.onSaved,
-    super.key,
   });
 
   final Future<void> Function(String value) onSaved;
