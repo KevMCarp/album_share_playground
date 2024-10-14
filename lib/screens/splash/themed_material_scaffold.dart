@@ -24,6 +24,7 @@ class ThemedMaterialScaffold extends StatelessWidget {
         id: id,
         showTitleBar: false,
         body: child,
+        isSplash: true,
       ),
     );
   }

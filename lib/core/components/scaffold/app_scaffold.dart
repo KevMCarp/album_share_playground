@@ -16,6 +16,7 @@ class AppScaffold extends StatelessWidget {
     required this.body,
     this.bottomNavigationBar,
     this.sidebar,
+    this.isSplash = false,
     super.key,
   });
 
@@ -41,8 +42,11 @@ class AppScaffold extends StatelessWidget {
 
   final AppSidebar? sidebar;
 
+  final bool isSplash;
+
   @override
   Widget build(BuildContext context) {
+    final child = isSplash ? body : AuthListener(child: body);
     return forPlatform(
       desktop: () {
         return DesktopScaffold(
@@ -50,7 +54,7 @@ class AppScaffold extends StatelessWidget {
           showTitleBar: showTitleBar,
           titleBarIcons: titleBarIcons,
           showBackButton: showBackButton,
-          body: AuthListener(child: body),
+          body: child,
           bottomNavigationBar: bottomNavigationBar,
           header: header,
           endDrawer: sidebar,
@@ -62,7 +66,7 @@ class AppScaffold extends StatelessWidget {
           showTitleBar: showTitleBar,
           titleBarIcons: titleBarIcons,
           showBackButton: showBackButton,
-          body: AuthListener(child: body),
+          body: child,
           bottomNavigationBar: bottomNavigationBar,
           header: header,
           endDrawer: sidebar,
