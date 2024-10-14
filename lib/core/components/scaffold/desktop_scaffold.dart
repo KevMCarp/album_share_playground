@@ -50,6 +50,9 @@ class DesktopScaffold extends ConsumerWidget {
     final appBarVisible = ref.watch(appBarListenerProvider);
     final sidebarStatus = ref.watch(sidebarListenerProvider(id));
 
+    void closeSidebar() =>
+        ref.read(sidebarListenerProvider(id).notifier).close();
+
     return Scaffold(
       endDrawer: endDrawer,
       endDrawerEnableOpenDragGesture: false,
@@ -82,6 +85,17 @@ class DesktopScaffold extends ConsumerWidget {
               right: 0,
               bottom: appBarVisible ? 0 : -kBottomNavigationBarHeight,
               child: bottomNavigationBar!,
+            ),
+          if (endDrawer != null && sidebarStatus == SidebarStatus.open)
+            Positioned(
+              top: appBarVisible ? appBarHeight() : 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: GestureDetector(
+                onTap: closeSidebar,
+                behavior: HitTestBehavior.translucent,
+              ),
             ),
           if (endDrawer != null)
             AnimatedPositioned(

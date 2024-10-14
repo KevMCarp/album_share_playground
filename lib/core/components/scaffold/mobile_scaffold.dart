@@ -57,6 +57,9 @@ class MobileScaffold extends ConsumerWidget {
         (theme.appBarTheme.backgroundColor ?? theme.colorScheme.surface)
             .withOpacity(0.7);
 
+    void closeSidebar() =>
+        ref.read(sidebarListenerProvider(id).notifier).close();
+
     return Scaffold(
       endDrawer: endDrawer,
       endDrawerEnableOpenDragGesture: false,
@@ -100,6 +103,17 @@ class MobileScaffold extends ConsumerWidget {
               right: 0,
               bottom: appBarVisible ? 0 : -kBottomNavBarHeight,
               child: bottomNavigationBar!,
+            ),
+          if (endDrawer != null && sidebarStatus == SidebarStatus.open)
+            Positioned(
+              top: appBarVisible ? MobileScaffold.appBarHeight(context) : 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: GestureDetector(
+                onTap: closeSidebar,
+                behavior: HitTestBehavior.translucent,
+              ),
             ),
           if (endDrawer != null)
             AnimatedPositioned(
