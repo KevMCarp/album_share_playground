@@ -27,7 +27,7 @@ class UserDetail {
       id: json['id'],
       email: json['email'],
       name: json['name'],
-      profileImagePath: json['profileImagePath'],
+      profileImagePath: json['profileImagePath'] ?? '',
       avatarColor: AvatarColor.fromString(json['avatarColor']),
     );
   }
