@@ -17,19 +17,15 @@ class ActivityButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isOpen = ref.watch(sidebarListenerProvider(id)).isOpen;
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onDoubleTap: () => print('Double tap button'),
-      child: IconButton(
-        icon: const Icon(Icons.message),
-        onPressed: () => _openOrClose(!isOpen, ref),
-        iconSize: 18,
-        style: IconButton.styleFrom(
-          minimumSize: const Size(25, 25),
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(
-              Radius.circular(20),
-            ),
+    return IconButton(
+      icon: const Icon(Icons.message),
+      onPressed: () => _openOrClose(!isOpen, ref),
+      iconSize: 18,
+      style: IconButton.styleFrom(
+        minimumSize: const Size(25, 25),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(20),
           ),
         ),
       ),
