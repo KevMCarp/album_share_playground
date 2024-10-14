@@ -1,7 +1,7 @@
-import 'package:album_share/core/utils/app_localisations.dart';
-import 'package:isar/isar.dart';
 import 'package:humanizer/humanizer.dart' show ApproximateTimeExtensions;
+import 'package:isar/isar.dart';
 
+import '../core/utils/app_localisations.dart';
 import '../core/utils/db_utils.dart';
 import 'asset.dart';
 import 'json_map.dart';
@@ -48,21 +48,21 @@ class Activity {
     final userName = user.name;
 
     if (asset == null) {
-      return locale.commentedAsset(userName);
+      return locale.userCommentedOther(1, userName);
     }
 
     switch (type) {
       case ActivityType.comment:
         return switch (asset.type) {
-          AssetType.image => locale.commentedPhoto(userName),
-          AssetType.video => locale.commentedVideo(userName),
-          AssetType _ => locale.commentedAsset(userName),
+          AssetType.image => locale.userCommentedImages(1, userName),
+          AssetType.video => locale.userCommentedVideos(1, userName),
+          AssetType _ => locale.userCommentedOther(1, userName),
         };
       case ActivityType.like:
         return switch (asset.type) {
-          AssetType.image => locale.likedPhoto(userName),
-          AssetType.video => locale.likedVideo(userName),
-          AssetType _ => locale.likedAsset(userName),
+          AssetType.image => locale.userLikedImages(1, userName),
+          AssetType.video => locale.userLikedVideos(1, userName),
+          AssetType _ => locale.userLikedOther(1, userName),
         };
     }
   }
