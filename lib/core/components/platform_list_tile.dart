@@ -27,6 +27,7 @@ class PlatformSwitchListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return ListTile(
+      enabled: onChanged != null,
       title: title,
       subtitle: subtitle,
       isThreeLine: isThreeLine,
