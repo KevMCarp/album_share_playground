@@ -1,14 +1,17 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
 
 import '../../core/utils/app_localisations.dart';
 import '../../core/utils/extension_methods.dart';
 import '../../models/activity.dart';
+import '../../models/activity_count.dart';
 import '../../models/album.dart';
 import '../../models/asset.dart';
+import '../../models/asset_count.dart';
+import '../../models/user_detail.dart';
 import '../api/api_service.dart';
 import '../database/database_service.dart';
 import '../notifications/notifications_service.dart';
@@ -55,100 +58,164 @@ class SyncService extends StateNotifier<SyncState> {
   }
 
   Future<List<Album>> _syncAlbums() async {
-    late bool albumFetchFailed;
+    ({Object? error, StackTrace stack})? albumFetchFailure;
 
     final onlineAlbums = await _api.getSharedAlbums().then((albums) {
-      albumFetchFailed = false;
       return albums;
-    }).onError((_, __) {
-      albumFetchFailed = true;
+    }).onError((error, stack) {
+      albumFetchFailure = (error: error, stack: stack);
       return [];
     });
 
-    // Client offline, use local only
-    if (albumFetchFailed) {
-      _logger.warning('Album fetch failed');
-      return [];
-    }
-
     final offlineAlbums = await _db.allAlbums();
 
-    // Downloaded new assets.
+    // Client offline, use local only
+    if (albumFetchFailure != null) {
+      _logger.warning(
+        'Album fetch failed',
+        albumFetchFailure?.error,
+        albumFetchFailure?.stack,
+      );
+      return offlineAlbums;
+    }
+
+    // All assets downloaded from server.
+    final List<Asset> assets = [];
+    // Assets downloaded from server not found in db.
+    final List<Asset> newAssets = [];
+    // If offline assets differs to online assets.
     bool assetsUpdated = false;
 
-    final List<Asset> assets = [];
     for (Album album in onlineAlbums) {
       final offlineIndex = offlineAlbums.indexOf(album);
 
+      bool albumUpdated;
       // If album is not in offline db
-      // Or album in offline db is out of date.
-      bool albumUpdated = false;
       if (offlineIndex == -1) {
         _logger.info('Album ${album.id} not found in offline db.');
         albumUpdated = true;
-      } else if (offlineAlbums[offlineIndex].lastUpdatedMillis !=
+      }
+      // Or album in offline db is out of date.
+      else if (offlineAlbums[offlineIndex].lastUpdatedMillis !=
           album.lastUpdatedMillis) {
         _logger.info('Album ${album.id} has been updated.');
         albumUpdated = true;
-      } else {
+      }
+      // Otherwise album is up to date
+      else {
         _logger.info('No changes to album ${album.id}');
+        albumUpdated = false;
+      }
+
+      final offlineAssets = await _db.assets(album);
+      final onlineAssets = await _api.getAlbumAssets(album);
+
+      if (!onlineAssets.equals(offlineAssets)) {
+        assetsUpdated = true;
       }
 
       if (albumUpdated) {
         try {
           _logger.info('Fetching new assets.');
-          assets.merge(await _api.getAlbumAssets(album.id));
-          assetsUpdated = true;
+
+          assets.merge(onlineAssets);
+          newAssets.merge(onlineAssets.listWhere((asset) {
+            if (state.firstRun) {
+              final now = DateTime.now();
+              return now.difference(asset.createdAt).inDays < 1;
+            }
+            return !offlineAssets.contains(asset);
+          }));
         } on ApiException {
           _logger.warning('Failed to update assets for album.');
-          assets.merge(await _db.assets(album));
+          assets.merge(offlineAssets);
         }
       } else {
-        assets.merge(await _db.assets(album));
+        assets.merge(offlineAssets);
       }
     }
 
-    if (kDebugMode) {
-      _logger.info('Checking for duplicates');
-      for (int i = 0; i < assets.length; i++) {
-        final asset = assets.elementAt(i);
-        final duplicates = assets.where((a) => a.id == asset.id);
-        final duplicateCount = duplicates.length - 1;
-        if (duplicateCount > 0) {
-          throw '$duplicateCount Duplicate(s) found for asset: $asset';
-        }
-      }
-    }
-
-    if (assetsUpdated || !onlineAlbums.equals(offlineAlbums)) {
-      _logger.info('Assets updated: $assetsUpdated');
-      _logger.info('Saving to offline db.');
+    if (newAssets.isNotEmpty || assetsUpdated) {
+      _logger.info('Assets updated, saving to offline DB.');
+      // Send notification.
+      _notifyAssets(newAssets, _createUserMap(onlineAlbums));
+      // Save changes
       await _db.setAlbums(onlineAlbums);
       await _db.setAssets(assets.sorted());
     }
 
+    // Return albums to allow checking for activity.
     return onlineAlbums;
+  }
+
+  /// Returns a map of users across all albums.
+  ///
+  /// Key is the user's id, value is the user's name.
+  Map<String, String> _createUserMap(List<Album> albums) {
+    Map<String, String> userMap = {};
+    for (Album album in albums) {
+      for (UserDetail user in album.users) {
+        userMap[user.id] = user.name;
+      }
+    }
+    return userMap;
+  }
+
+  void _notifyAssets(List<Asset> assets, Map<String, String> userMap) async {
+    if (assets.isEmpty) {
+      return;
+    }
+
+    final currentUser = await _db.getUser();
+
+    // Key: asset owner name
+    Map<String, AssetCount> map = {};
+    for (Asset asset in assets) {
+      // Don;t notify if uploaded by current user.
+      if (asset.ownerId == currentUser?.id) {
+        continue;
+      }
+
+      final name = userMap[asset.ownerId] ?? 'unknown';
+      final count = map[name] ?? AssetCount();
+
+      switch (asset.type) {
+        case AssetType.image:
+          count.photos++;
+          break;
+        case AssetType.video:
+          count.videos++;
+          break;
+        default:
+          count.others++;
+          break;
+      }
+    }
+
+    if (map.isEmpty) {
+      return;
+    }
+
+    final buf = StringBuffer();
+    final locale = AppLocale.instance.current;
+
+    for (var entry in map.entries) {
+      entry.value.describe(buf, entry.key, locale);
+    }
+
+    await _notifications.assets(
+      title: locale.newAssetsNotification,
+      content: buf.toString(),
+      assets: assets,
+    );
   }
 
   Future<void> _syncActivity(List<Album> albums) async {
     final List<Activity> activity = [];
+    List<Activity> newActivity = [];
 
     for (final album in albums) {
-      await _getAlbumActivity(album, activity);
-    }
-
-    late List<Activity> newActivity;
-
-    if (state.firstRun) {
-      newActivity = activity.listWhere((activ) {
-        final now = DateTime.now();
-        return now.difference(activ.createdAt).inDays < 1;
-      });
-    } else {
-      final offlineActivity = await _db.getActivity();
-      newActivity = activity.listWhere((activ) {
-        return !offlineActivity.contains(activ);
-      });
+      await _getAlbumActivity(album, activity, newActivity, state.firstRun);
     }
 
     if (newActivity.isNotEmpty) {
@@ -159,7 +226,12 @@ class SyncService extends StateNotifier<SyncState> {
     await _db.setActivity(activity);
   }
 
-  Future<void> _getAlbumActivity(Album album, List<Activity> activity) async {
+  Future<void> _getAlbumActivity(
+    Album album,
+    List<Activity> activity,
+    List<Activity> newActivity,
+    bool firstRun,
+  ) async {
     _logger.info('Fetching activity for album ${album.id}');
     late final bool activityFetchFailed;
 
@@ -172,64 +244,64 @@ class SyncService extends StateNotifier<SyncState> {
       return const [];
     });
 
+    final offlineActivity = await _db.getActivity(album: album);
+
     if (activityFetchFailed) {
-      activity.addAll(await _db.getActivity(album: album));
+      activity.addAll(offlineActivity);
       return;
     }
+
     activity.addAll(onlineActivity);
+    newActivity.addAll(onlineActivity.where((a) {
+      if (firstRun) {
+        final now = DateTime.now();
+        return now.difference(a.createdAt).inDays < 1;
+      }
+      return !offlineActivity.contains(a);
+    }));
   }
 
   void _notifyActivity(List<Activity> activity) async {
     if (activity.isEmpty) {
       return;
     }
-    final user = await _db.getUser();
-    if (user == null) {
-      return;
+
+    final currentUser = await _db.getUser();
+
+    Map<String, ActivityCount> map = {};
+    for (Activity event in activity) {
+      // Don't notify if created by current user.
+      if (event.user.id == currentUser?.id) {
+        continue;
+      }
+
+      final count = map[event.user.name] ?? ActivityCount();
+      // TODO: Should we separate asset types?
+      // This would involve looking up each asset in the db.
+      // Maybe only do this if there is only a small number of activity.
+      switch (event.type) {
+        case ActivityType.like:
+          count.otherLikes++;
+        case ActivityType.comment:
+          count.otherComments++;
+          break;
+      }
     }
-    // Activity relevant for current user.
-    // Removes anything posted by this user.
-    final activityForUser = activity.where((a) => a.user.id == user.id);
-    if (activityForUser.isEmpty) {
+
+    if (map.isEmpty) {
       return;
     }
 
+    final buf = StringBuffer();
     final locale = AppLocale.instance.current;
-    if (activity.length == 1) {
-      final activ = activity[0];
-      Asset? asset;
-      if (activ.assetId != null) {
-        asset = await _db.asset(id: activ.assetId!);
-      }
-      if (asset != null) {
-        _notifications.activity(
-          title: activ.describe(locale, asset),
-          content: activ.comment ?? '❤️',
-          assets: [asset],
-        );
-      }
-      return;
+
+    for (var entry in map.entries) {
+      entry.value.describe(buf, entry.key, locale);
     }
 
-    final hasLikes = activity.any((e) => e.type == ActivityType.like);
-    final hasComments = activity.any((e) => e.type == ActivityType.comment);
-
-    if (hasLikes && hasComments) {
-      _notifications.activity(
-        content: locale.notificationCount(activity.length),
-      );
-      return;
-    }
-    // Likes only
-    if (hasLikes) {
-      _notifications.activity(
-        content: locale.likesCount(activity.length),
-      );
-      return;
-    }
-    // Comments only
-    _notifications.activity(
-      content: locale.commentsCount(activity.length),
+    await _notifications.activity(
+      title: locale.newActivityNotification,
+      content: buf.toString(),
     );
   }
 
