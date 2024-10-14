@@ -99,6 +99,7 @@ class DatabaseService {
         await _db.albums.clear();
         await _db.assets.clear();
         await _db.preferences.clear();
+        await _db.activity.clear();
         if (endpoint) {
           await _db.endpoints.clear();
         }
