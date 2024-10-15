@@ -213,5 +213,9 @@
     "noActivity": "No activity yet.",
     "@noActivity": {
         "description": "A message when the activity list is empty"
-    }
+    },
+    "message": "Message",
+    "@message": {
+        "description": "Label for the message text field"
+    } 
 }

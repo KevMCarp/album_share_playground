@@ -1,15 +1,14 @@
 import 'dart:async';
 
-import 'package:album_share/core/utils/app_localisations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../immich/extensions/build_context_extensions.dart';
 import '../../../models/activity.dart';
 import '../../../models/album.dart';
 import '../../../models/asset.dart';
 import '../../../services/activity/activity_providers.dart';
 import '../../../services/database/database_providers.dart';
+import '../../utils/app_localisations.dart';
 import '../../utils/extension_methods.dart';
 import '../user_avatar.dart';
 import 'app_sidebar.dart';
@@ -80,6 +79,8 @@ class _ActivityWidgetState extends State<_ActivityWidget>
   TabController? _controller;
   int _index = 0;
 
+  Album get _focusedAlbum => widget.albums[_index];
+
   @override
   void initState() {
     super.initState();
@@ -91,7 +92,7 @@ class _ActivityWidgetState extends State<_ActivityWidget>
     super.didUpdateWidget(oldWidget);
     if (_index <= widget.albums.length) {
       _setTabController();
-      _index = widget.albums.length - 1;
+      _index = _controller!.index;
     }
   }
 
@@ -112,7 +113,7 @@ class _ActivityWidgetState extends State<_ActivityWidget>
 
   Future<void> _sendMessage(String value, WidgetRef ref) {
     return ref.read(ActivityProviders.uploadService).uploadComment(
-          widget.albums[_index].id,
+          _focusedAlbum.id,
           widget.asset.id,
           value,
         );
@@ -187,6 +188,7 @@ class _ActivityWidgetState extends State<_ActivityWidget>
         Consumer(
           builder: (context, ref, child) => _SendMessageWidget(
             onSaved: (value) => _sendMessage(value, ref),
+            enabled: _focusedAlbum.isActivityEnabled,
           ),
         ),
       ],
@@ -240,9 +242,11 @@ class _ActivityWidgetState extends State<_ActivityWidget>
 class _SendMessageWidget extends StatefulWidget {
   const _SendMessageWidget({
     required this.onSaved,
+    required this.enabled,
   });
 
   final Future<void> Function(String value) onSaved;
+  final bool enabled;
 
   @override
   State<_SendMessageWidget> createState() => __SendMessageWidgetState();
@@ -271,36 +275,36 @@ class __SendMessageWidgetState extends State<_SendMessageWidget> {
     _controller.clear();
   }
 
+  VoidCallback? _onSaved() {
+    return widget.enabled && _controller.text.isNotEmpty ? _saveMessage : null;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final textColor = context.isDarkTheme ? Colors.white : Colors.black;
+    final onSaved = _onSaved();
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              minLines: 1,
-              maxLines: 5,
-              onChanged: (_) => _updateButtonVisibility(),
-              controller: _controller,
-              decoration: InputDecoration(
-                hintText: 'Message', //TODO locale
-                constraints: const BoxConstraints(minHeight: 40),
-                border: const OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(8)),
-                ),
-                hintStyle: TextStyle(color: textColor.withOpacity(0.4)),
-                contentPadding: const EdgeInsets.fromLTRB(5, 4, 4, 2),
-              ),
+      child: TextField(
+        enabled: widget.enabled,
+        onChanged: (_) => _updateButtonVisibility(),
+        onEditingComplete: onSaved,
+        controller: _controller,
+        decoration: InputDecoration(
+          hintText: AppLocalizations.of(context)!.message,
+          enabled: widget.enabled,
+          border: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(25)),
+          ),
+          suffixIcon: Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: IconButton.filledTonal(
+              onPressed: onSaved,
+              icon: const Icon(Icons.send),
+              // iconSize: 16,
+              // visualDensity: VisualDensity.compact,
             ),
           ),
-          const SizedBox(width: 4),
-          IconButton.filledTonal(
-            onPressed: _controller.text.isEmpty ? null : _saveMessage,
-            icon: const Icon(Icons.send),
-          )
-        ],
+        ),
       ),
     );
   }
