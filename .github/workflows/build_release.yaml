@@ -26,6 +26,9 @@ jobs:
         id: should_force
         run: echo "should_force=${{ github.event_name == 'workflow_call' || github.event_name == 'workflow_dispatch '}}" >> "$GITHUB_OUTPUT"
 
+      - name: Check  ref
+        run: echo "${{ github.ref_name }}"
+
   android:
     name: Build and sign android bundle
     needs: pre-build-job
