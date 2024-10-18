@@ -5,6 +5,7 @@ on:
     types: 
       - opened
       - edited
+      - synchronize
     paths:
       - 'lib/**'
       - 'video_player/lib/**'
@@ -53,7 +54,4 @@ jobs:
           cd version_check
           dart pub get
           dart run bin/version_check.dart -p "${{  steps.tag-version.outputs.tag  }}" -n "${{  steps.yaml-version.outputs['version']  }}"
-
-
-
   
