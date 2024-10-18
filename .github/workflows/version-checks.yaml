@@ -12,8 +12,10 @@ on:
 
 jobs:
 
-  check-files-changes:
+  check-files-changed:
     runs-on: ubuntu-latest
+    outputs:
+      shoud-verify: ${{ steps.changed-files.outputs.matched_files != '' }}
 
     steps:
       - id: changed-files
@@ -32,6 +34,8 @@ jobs:
       
   verify-version:
     runs-on: ubuntu-latest
+    needs: check-files-changed
+    if: ${{ needs.check-files-changed.outputs.shoud-verify }}
 
     steps:
       - uses: actions/checkout@v4
