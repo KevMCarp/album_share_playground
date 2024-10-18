@@ -5,11 +5,31 @@ on:
     types: 
       - opened
       - edited
-    paths:
-      - 'lib/**'
-      - 'video_player/lib/**'
+      - synchronize
+    # paths:
+    #   - 'lib/**'
+    #   - 'video_player/lib/**'
 
 jobs:
+
+  check-files-changes:
+    runs-on: ubuntu-latest
+
+    steps:
+      - id: changed-files
+        uses: knu/changed-files@v1
+        with:
+          paths: |
+            'lib/**'
+            'video_player/lib/**'
+
+      - name: show changed files
+        run: |
+          echo "Changed files:"
+          echo "${{ steps.changed-files.outputs.changed_files }}"
+          echo "Matched files:"
+          echo "${{ steps.changed-files.outputs.matched_files }}"
+      
   verify-version:
     runs-on: ubuntu-latest
 
@@ -53,7 +73,4 @@ jobs:
           cd version_check
           dart pub get
           dart run bin/version_check.dart -p "${{  steps.tag-version.outputs.tag  }}" -n "${{  steps.yaml-version.outputs['version']  }}"
-
-
-
   
