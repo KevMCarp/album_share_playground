@@ -18,7 +18,7 @@ jobs:
 
       - name: Parse pubspec.yaml
         id: yaml-version
-        uses: pietrobolcato/action-read-yaml@1.1.0
+        uses: nichmor/minimal-read-yaml@v0.0.2
         with:
           config: pubspec.yaml
 
