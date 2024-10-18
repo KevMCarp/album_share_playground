@@ -13,7 +13,6 @@ void main() {
   VideoPlayer.ensureInitialized();
   AppWindow.ensureInitialized();
 
-  
   runApp(
     const ProviderScope(
       child: LocaleScope(
