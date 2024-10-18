@@ -52,4 +52,8 @@ jobs:
         run: |
           cd version_check
           dart pub get
-          dart run version_check/bin/version_check.dart -p "${{  steps.tag-version.outputs.tag  }}" -n "${{  steps.yaml-version.outputs.data  }}"
+          dart run bin/version_check.dart -p "${{  steps.tag-version.outputs.tag  }}" -n "${{  steps.yaml-version.outputs['version']  }}"
+
+
+
+  
