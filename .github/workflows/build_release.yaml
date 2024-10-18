@@ -1,51 +1,43 @@
 name: Build Release
 
 on:
-  workflow_dispatch:
-  workflow_call:
-    inputs:
-      ref:
-        required: false
-        type: string
   push:
-    branches:
+    branches:  
       - 'main'
-    # paths:
-    #   - 'lib/**'
-    #   - 'video_player/lib/**'
+    paths:
+      - 'lib/**'
+      - 'video_player/lib/**'
 
 jobs:
-  pre-build-job:
+  create-release:
     runs-on: ubuntu-latest
     outputs:
-      should_run: ${{ steps.should_force.outputs.should_force == 'true' }}
+      tag: v${{ steps.yaml-version.outputs['version'] }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check if we should force jobs to run.
-        id: should_force
-        run: echo "should_force=${{ github.event_name == 'workflow_call' || github.event_name == 'workflow_dispatch '}}" >> "$GITHUB_OUTPUT"
+      - name: Parse pubspec.yaml
+        id: yaml-version
+        uses: pietrobolcato/action-read-yaml@1.1.0
+        with:
+          config: pubspec.yaml
 
-      - name: Check  ref
-        run: echo "${{ github.ref_name }}"
-
+      - name: Create release
+        uses: ncipollo/release-action@v1
+        with:
+            allowUpdates: true
+            draft: true
+            tag: "v${{ steps.yaml-version.outputs['version'] }}"
+            commit: 'main'
+            token: ${{ secrets.GITHUB_TOKEN }}
+  
   android:
     name: Build and sign android bundle
-    needs: pre-build-job
-    if: ${{ !github.event.pull_request.head.repo.fork && github.actor != 'dependabot[bot]' && needs.pre-build-job.outputs.should_run == 'true' }}
+    needs: create-release
     runs-on: ubuntu-latest
     steps:
-      - name: Determine ref
-        id: get-ref
-        run: |
-          input_ref="${{ inputs.ref }}"
-          github_ref="${{ github.sha }}"
-          ref="${input_ref:-$github_ref}"
-          echo "ref=$ref" >> $GITHUB_OUTPUT
-
+      
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ steps.get-ref.outputs.ref }}
 
       - name: Setup the Java environment
         uses: actions/setup-java@v4
@@ -77,6 +69,7 @@ jobs:
         run: |
           flutter pub get
           flutter build appbundle
+          ls -lah
 
       - name: Rename bundle
         run: mv build/app/outputs/bundle/release/app-release.aab build/app/outputs/bundle/release/AlbumShare-${{ github.ref_name }}-android.aab
@@ -89,15 +82,12 @@ jobs:
           directory: build/app/intermediates/merged_native_libs/release/out/lib/
 
       - name: Add files to release
-        uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: ncipollo/release-action@v1
         with:
-          files: |
-            build/app/intermediates/merged_native_libs/release/out/lib/AlbumShare-{{github.ref_name}}-android-symbols.zip
-            build/app/outputs/bundle/release/AlbumShare-{{github.ref_name}}-android.aab
-
+              allowUpdates: true
+              tag: ${{ needs.create-release.outputs.tag }}
+              token: ${{ secrets.GITHUB_TOKEN }}
+              artifacts: 'build/app/intermediates/merged_native_libs/release/out/lib/AlbumShare-${{ needs.create-release.outputs.tag }}-android-symbols.zip,build/app/outputs/bundle/release/AlbumShare-${{ needs.create-release.outputs.tag }}-android.aab'
   # build_linux:
   #   runs-on: ubuntu-latest
   #   steps:
