@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.3.3] - 19/10/2024
 Updated main.dart
+something
 
 ## [0.3.0] - 15/10/2024
 
