@@ -78,8 +78,8 @@ jobs:
         uses: thedoctor0/zip-release@0.7.6
         with:
           type: "zip"
-          filename: AlbumShare-{{github.ref_name}}-android-symbols.zip
-          directory: build/app/intermediates/merged_native_libs/release/out/lib/
+          filename: AlbumShare-${{github.ref_name}}-android-symbols.zip
+          directory: build/app/intermediates/merged_native_libs/release/mergeReleaseNativeLibs/out/lib
 
       - name: Add files to release
         uses: ncipollo/release-action@v1
@@ -87,7 +87,7 @@ jobs:
               allowUpdates: true
               tag: ${{ needs.create-release.outputs.tag }}
               token: ${{ secrets.GITHUB_TOKEN }}
-              artifacts: 'build/app/intermediates/merged_native_libs/release/out/lib/AlbumShare-${{ needs.create-release.outputs.tag }}-android-symbols.zip,build/app/outputs/bundle/release/AlbumShare-${{ needs.create-release.outputs.tag }}-android.aab'
+              artifacts: 'build/app/intermediates/merged_native_libs/release/mergeReleaseNativeLibs/out/lib/AlbumShare-${{ needs.create-release.outputs.tag }}-android-symbols.zip,build/app/outputs/bundle/release/AlbumShare-${{ needs.create-release.outputs.tag }}-android.aab'
   # build_linux:
   #   runs-on: ubuntu-latest
   #   steps:
