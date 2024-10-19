@@ -6,13 +6,11 @@ on:
       - opened
       - edited
       - synchronize
-    # paths:
-    #   - 'lib/**'
-    #   - 'video_player/lib/**'
 
 jobs:
 
   check-files-changed:
+    name: Check files have changed that would require a version bump.
     runs-on: ubuntu-latest
     outputs:
       should-verify: ${{ steps.changed-files.outputs.matched_files != '' }}
@@ -35,14 +33,12 @@ jobs:
           echo "${{ steps.changed-files.outputs.matched_files != ''}}"
       
   verify-version:
+    name: Verify pubspec version has been bumped & release notes updated.
     runs-on: ubuntu-latest
     needs: check-files-changed
     if: ${{ needs.check-files-changed.outputs.should-verify == 'true'}}
-
+  
     steps:
-      - name: Check should verfy
-        run: "Should verify: ${{ needs.check-files-changed.outputs.should-verify }}"
-
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
