@@ -37,7 +37,7 @@ jobs:
   verify-version:
     runs-on: ubuntu-latest
     needs: check-files-changed
-    if: ${{ needs.check-files-changed.outputs.should-verify }}
+    if: ${{ needs.check-files-changed.outputs.should-verify == 'true'}}
 
     steps:
       - name: Check should verfy
