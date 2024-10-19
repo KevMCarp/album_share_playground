@@ -13,15 +13,13 @@ jobs:
     name: Check files have changed that would require a version bump.
     runs-on: ubuntu-latest
     outputs:
-      should-verify: ${{ steps.changed-files.outputs.matched_files != '' }}
-
+      should-verify: ${{ contains(steps.changed-files.outputs.changed_files, 'lib/') }} 
     steps:
       - id: changed-files
         uses: knu/changed-files@v1
         with:
           paths: |
-            'lib/**'
-            'video_player/lib/**'
+            '**/lib'
 
       - name: show changed files
         run: |
@@ -30,7 +28,7 @@ jobs:
           echo "Matched files:"
           echo "${{ steps.changed-files.outputs.matched_files }}"
           echo "Should verify:"
-          echo "${{ steps.changed-files.outputs.matched_files != ''}}"
+          echo "${{ contains(steps.changed-files.outputs.changed_files, 'lib/') }} "
       
   verify-version:
     name: Verify pubspec version has been bumped & release notes updated.
