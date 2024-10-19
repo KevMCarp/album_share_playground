@@ -40,6 +40,9 @@ jobs:
     if: ${{ needs.check-files-changed.outputs.should-verify }}
 
     steps:
+      - name: Check should verfy
+        run: "Should verify: ${{ needs.check-files-changed.outputs.should-verify }}"
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
