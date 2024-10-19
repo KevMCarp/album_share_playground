@@ -20,7 +20,7 @@ jobs:
         uses: knu/changed-files@v1
         with:
           paths: |
-            '**/lib'
+            '**/lib/*'
 
       - name: show changed files
         run: |
