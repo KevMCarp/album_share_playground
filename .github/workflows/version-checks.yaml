@@ -20,8 +20,7 @@ jobs:
         uses: knu/changed-files@v1
         with:
           paths: |
-            'lib/**'
-            'video_player/lib/**'
+            '**/lib'
 
       - name: show changed files
         run: |
