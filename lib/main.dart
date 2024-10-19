@@ -12,7 +12,6 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   VideoPlayer.ensureInitialized();
   AppWindow.ensureInitialized();
-
   
   runApp(
     const ProviderScope(
