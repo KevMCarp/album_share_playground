@@ -12,7 +12,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   VideoPlayer.ensureInitialized();
   AppWindow.ensureInitialized();
-  
+  print('Hi');
   runApp(
     const ProviderScope(
       child: LocaleScope(
